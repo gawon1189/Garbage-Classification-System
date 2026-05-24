@@ -30,27 +30,27 @@
 
 ### 2. 为什么选择物理材质分类作为基准？
 
-* **超越地域法规的通用性 (Universal Adaptability)**
+**超越地域法规的通用性 (Universal Adaptability)**
 * 避免将深度学习模型直接绑定在特定城市的临时行政垃圾分类规章上（如北京 4 分类或首尔分拣机制），回归物体最本质的物理材质属性 。
 
-* **高效的下游动态映射 (Dynamic Downstream Mapping)**
+**高效的下游动态映射 (Dynamic Downstream Mapping)**
 * 训练阶段以物理类别为基准输出（金属、纸张、玻璃、塑料等），在应用部署端通过轻量化 JSON 映射表，即可适配全球任何城市（如北京的厨余/可回收/有害/其他 4 类体系） 。
 
 ---
 
 ### 3. 数据加工与维度对齐
 
-* **分类标签对齐 (Category Alignment)**
+**分类标签对齐 (Category Alignment)**
 * 利用 TACO 官方提供的 `annotations.json`，将 60 个细分维度标签映射并合并至 GD 数据集的 10 大核心物理材质系统，实现多源标签格式的整合。
 
 
-* **长宽比零失真预处理 (Letterbox Padding)**
+**长宽比零失真预处理 (Letterbox Padding)**
 * 废弃会导致物体形状畸变的常规拉伸方式，采用边缘等比填充（Letterbox Padding）将分辨率标准化至 384x384 或 512x512 像素，完美保留瓶罐等物体的几何特征。
 
 
-* **严格数据治理与隔离 (Rigorous Data Isolation)**
+**严格数据治理与隔离 (Rigorous Data Isolation)**
 * 引入感知哈希（pHash）剔除跨库冗余图像 ；采用分层随机抽样（Stratified Sampling）按 80% / 10% / 10% 严格划分 Train / Val / Test 集合。
 
 
-* **像素级多级鲁棒增强 (Data Augmentation)**
+**像素级多级鲁棒增强 (Data Augmentation)**
 * 仅在训练集中集成 MixUp、CutOut 以及 HSV 色彩扰动，测试集保持绝对干净，以科学客观地评估模型的分类泛化性能。
