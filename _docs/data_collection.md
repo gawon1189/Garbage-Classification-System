@@ -1,12 +1,10 @@
-# 基于物理材质原生态分类（Level 1）的多源数据集融合方案
-
-## Multi-Source Dataset Fusion Scheme Based on Level 1 Physical Material Taxonomy
+# 基于物理材质分类的多源数据集融合方案
 
 ---
 
 ### 1. 选定数据集及官方来源 (Selected Datasets & Official Sources)
 
-#### 1.1 主干训练集 (Main Spine): The Garbage Dataset (GD) [Kunwar, 2026]
+#### 1.1 主训练集: The Garbage Dataset (GD) [Kunwar, 2026]
 
 * **数据占比：** 65% ~ 70% 
 
@@ -16,7 +14,7 @@
 
 * **官方来源：** 通过 DWaste 智能垃圾分类移动端 App 采集与社区众包整合，其图像具备高背景香农熵（$6.2\pm1.5$ bits/pixel）与真实光照偏差，构成模型泛化的根本基石。
 
-#### 1.2 野外鲁棒增强 (Wild Robustness): TACO
+#### 1.2 野外图像鲁棒性增强 (Wild Robustness): TACO
 
 * **数据占比：** 20%
 * **数据体量：** 1,500 张包含野外真实背景（森林、海滩、街头）的高精细分割标注图像。
@@ -30,38 +28,29 @@
 
 ---
 
-### 2. 为什么选择物理材质原生态分类（Level 1）作为基准？ (Why Level 1 Physical Classification?)
+### 2. 为什么选择物理材质分类作为基准？
 
 * **超越地域法规的通用性 (Universal Adaptability)**
 * 避免将深度学习模型直接绑定在特定城市的临时行政垃圾分类规章上（如北京 4 分类或首尔分拣机制），回归物体最本质的物理材质属性 。
 
-
-
-
 * **高效的下游动态映射 (Dynamic Downstream Mapping)**
-* 训练阶段以物理类别为基准输出（金属、纸张、玻璃、塑料等），在应用部署端通过轻量化 JSON 映射表，即可瞬间零成本适配全球任何城市（如北京的厨余/可回收/有害/其他 4 类体系） 。
-
-
-
-
+* 训练阶段以物理类别为基准输出（金属、纸张、玻璃、塑料等），在应用部署端通过轻量化 JSON 映射表，即可适配全球任何城市（如北京的厨余/可回收/有害/其他 4 类体系） 。
 
 ---
 
-### 3. 核心技术加工与对齐管道 (Core Technical Processing & Feeding Pipeline)
+### 3. 数据加工与维度对齐
 
 * **分类标签对齐 (Category Alignment)**
-* 利用 TACO 官方提供的 `annotations.json`，将 60 个细分维度标签严格重映射并合并至 GD 数据集的 10 大核心物理材质系统，实现多源标签格式的无缝整合。
+* 利用 TACO 官方提供的 `annotations.json`，将 60 个细分维度标签映射并合并至 GD 数据集的 10 大核心物理材质系统，实现多源标签格式的整合。
 
 
 * **长宽比零失真预处理 (Letterbox Padding)**
-* 废弃会导致物体几何畸变的常规拉伸手段，采用边缘等比填充（Letterbox Padding）将分辨率标准化至 384x384 或 512x512 像素，完美保留瓶罐等物体的本质几何轮廓特征。
+* 废弃会导致物体形状畸变的常规拉伸方式，采用边缘等比填充（Letterbox Padding）将分辨率标准化至 384x384 或 512x512 像素，完美保留瓶罐等物体的几何特征。
 
 
 * **严格数据治理与隔离 (Rigorous Data Isolation)**
-* 引入感知哈希（pHash）剔除跨库冗余图像 ；采用分层随机抽样（Stratified Sampling）按 80% / 10% / 10% 严格划分 Train / Val / Test 集合，杜绝任何学术层面的“数据泄露”。
-
-
+* 引入感知哈希（pHash）剔除跨库冗余图像 ；采用分层随机抽样（Stratified Sampling）按 80% / 10% / 10% 严格划分 Train / Val / Test 集合。
 
 
 * **像素级多级鲁棒增强 (Data Augmentation)**
-* 仅在训练集中集成 MixUp、CutOut 以及 HSV 色彩扰动，测试集保持绝对干净，以科学客观地评估模型的分类性能上限。
+* 仅在训练集中集成 MixUp、CutOut 以及 HSV 色彩扰动，测试集保持绝对干净，以科学客观地评估模型的分类泛化性能。
