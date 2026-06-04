@@ -82,7 +82,7 @@ pip install -r src/requirements.txt
 uvicorn src.app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-服务默认地址：
+服务默认地址：（端口被占用可以更换其他的）
 
 ```text
 http://localhost:8000
@@ -242,3 +242,14 @@ const result = await response.json();
 - 上传超过 `10MB` 的文件，前端先拦截。
 - 后端未启动时，前端展示连接失败。
 - 模型未加载成功时，`/predict` 返回 `MODEL_NOT_READY`。
+
+
+
+# !
+
+后续如果展示需求变多，可以再加：
+
+- POST /predict/batch：批量图片分类
+- GET /metrics：返回模型准确率、F1、混淆矩阵等
+- GET /mapping/beijing：把物理材质映射到北京四分类
+- GET /examples：给前端展示示例图片和示例结果
