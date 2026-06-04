@@ -1,14 +1,18 @@
 data/
+model/artifacts/
 *.pt
 *.onnx
 *.h5
 *.pkl
-*.zip
 
-__pycache__/
+*.zip
 *.pyc
 *.pyo
 *.pyd
+*.pyc
+*.pyo
+*.pyd
+
 .Python
 env/
 venv/
@@ -17,11 +21,18 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 .ipynb_checkpoints/
+
 */.ipynb_checkpoints/
 
 .Rhistory
 *.swp
 *.swo
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+*/.ipynb_checkpoints/
+
 .DS_Store
 .DS_Store?
 ._*

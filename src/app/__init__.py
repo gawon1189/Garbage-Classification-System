@@ -1,0 +1,1 @@
+"""Garbage classification inference API."""
