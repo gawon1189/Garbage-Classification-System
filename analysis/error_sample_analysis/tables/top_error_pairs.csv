@@ -1,0 +1,16 @@
+pair,count
+cardboard -> paper,11
+paper -> cardboard,6
+trash -> plastic,5
+trash -> paper,5
+plastic -> glass,5
+plastic -> trash,5
+glass -> plastic,4
+cardboard -> plastic,4
+plastic -> cardboard,4
+glass -> metal,3
+metal -> paper,3
+metal -> plastic,3
+plastic -> metal,3
+plastic -> paper,3
+trash -> metal,2

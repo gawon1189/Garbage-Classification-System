@@ -3,6 +3,7 @@ data/
 *.onnx
 *.h5
 *.pkl
+*.zip
 
 __pycache__/
 *.pyc
@@ -18,6 +19,9 @@ pip-delete-this-directory.txt
 .ipynb_checkpoints/
 */.ipynb_checkpoints/
 
+.Rhistory
+*.swp
+*.swo
 .DS_Store
 .DS_Store?
 ._*
