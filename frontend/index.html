@@ -827,6 +827,295 @@
       letter-spacing: .06em;
       color: var(--green-sage);
     }
+
+    /* ════════════════════════════════════════
+       BATCH RESULTS
+    ════════════════════════════════════════ */
+    .batch-section {
+      margin-top: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .batch-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-mid);
+    }
+
+    .batch-count {
+      font-family: "Courier Prime", monospace;
+      font-size: .72rem;
+      letter-spacing: .1em;
+      color: var(--green-sage);
+    }
+
+    .batch-reset-btn {
+      border: 1px solid var(--border-mid);
+      color: var(--ink-mid);
+      padding: 5px 14px;
+      font-family: "Courier Prime", monospace;
+      font-size: .68rem;
+      letter-spacing: .06em;
+      transition: background .15s;
+    }
+    .batch-reset-btn:hover { background: rgba(43,74,40,.06); }
+
+    /* Progress bar */
+    .batch-progress-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .batch-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-family: "Courier Prime", monospace;
+      font-size: .7rem;
+      color: var(--green-sage);
+    }
+    .batch-progress-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .batch-progress-fill {
+      height: 100%;
+      background: var(--green-rich);
+      border-radius: 99px;
+      transition: width .3s ease;
+    }
+
+    /* Image grid */
+    .batch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .batch-item {
+      border: 1px solid var(--border-mid);
+      background: rgba(255,255,255,.28);
+      overflow: hidden;
+    }
+
+    .batch-item-img-wrap {
+      position: relative;
+      height: 180px;
+      overflow: hidden;
+      background: var(--paper-mid);
+    }
+
+    .batch-item-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: sepia(6%) contrast(97%);
+    }
+
+    .batch-item-accent { height: 4px; }
+
+    .batch-item-filename {
+      font-family: "Courier Prime", monospace;
+      font-size: .65rem;
+      letter-spacing: .04em;
+      color: var(--green-sage);
+      padding: 10px 14px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .batch-item-class {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+      padding: 4px 14px 2px;
+      color: var(--ink);
+    }
+
+    .batch-item-en {
+      font-family: "Fraunces", serif;
+      font-size: .82rem;
+      font-style: italic;
+      color: var(--green-mid);
+      padding: 0 14px 10px;
+    }
+
+    .batch-item-conf-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px 12px;
+    }
+
+    .batch-item-conf-pct {
+      font-family: "Fraunces", serif;
+      font-size: 1.1rem;
+      color: var(--green-rich);
+      flex-shrink: 0;
+      min-width: 54px;
+    }
+
+    .batch-item-topk {
+      padding: 10px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      border-top: 1px solid var(--border);
+    }
+
+    .batch-item-topk-row {
+      display: grid;
+      grid-template-columns: 1fr 70px 42px;
+      align-items: center;
+      gap: 8px;
+      font-size: .78rem;
+    }
+
+    .batch-item-topk-name { color: var(--ink); }
+    .batch-item-topk-score {
+      font-family: "Courier Prime", monospace;
+      font-size: .72rem;
+      color: var(--ink-mid);
+      text-align: right;
+    }
+
+    .batch-item-metrics {
+      padding: 10px 14px 12px;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .batch-metric {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .batch-metric-label {
+      font-family: "Courier Prime", monospace;
+      font-size: .58rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--green-sage);
+    }
+    .batch-metric-val {
+      font-family: "Fraunces", serif;
+      font-size: .95rem;
+      color: var(--ink);
+    }
+
+    .batch-item-error {
+      padding: 14px;
+      font-size: .82rem;
+      color: #7a3820;
+      font-style: italic;
+    }
+
+    /* Summary table */
+    .summary-wrap {
+      border: 1px solid var(--border-mid);
+      overflow: hidden;
+    }
+
+    .summary-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: var(--green-deep);
+    }
+
+    .summary-title {
+      font-family: "Fraunces", serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--paper);
+    }
+
+    .summary-export-btn {
+      border: 1px solid rgba(234,228,211,.3);
+      color: rgba(234,228,211,.8);
+      padding: 4px 13px;
+      font-family: "Courier Prime", monospace;
+      font-size: .65rem;
+      letter-spacing: .08em;
+      transition: background .15s;
+    }
+    .summary-export-btn:hover { background: rgba(255,255,255,.1); }
+
+    .summary-table-wrap { overflow-x: auto; }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .82rem;
+    }
+
+    .summary-table th {
+      font-family: "Courier Prime", monospace;
+      font-size: .62rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--green-sage);
+      padding: 10px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-mid);
+      background: rgba(43,74,40,.04);
+      white-space: nowrap;
+    }
+
+    .summary-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      color: var(--ink-mid);
+    }
+
+    .summary-table tr:last-child td { border-bottom: none; }
+    .summary-table tr:hover td { background: rgba(43,74,40,.03); }
+
+    .summary-table .td-thumb {
+      width: 44px; height: 44px;
+      object-fit: cover;
+      border-radius: 1px;
+      filter: sepia(10%);
+    }
+
+    .summary-table .td-class {
+      font-family: "Noto Serif SC", serif;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .summary-table .td-conf {
+      font-family: "Fraunces", serif;
+      font-size: .95rem;
+      font-weight: 400;
+    }
+
+    .summary-table .td-mono {
+      font-family: "Courier Prime", monospace;
+      font-size: .75rem;
+    }
+
+    .conf-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .conf-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
   </style>
 </head>
 <body>
@@ -933,7 +1222,7 @@
         </div>
 
         <div class="upload-zone" id="upload-zone" tabindex="0" role="button" aria-label="点击或拖拽上传图片">
-          <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" style="display:none"/>
+          <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" multiple style="display:none"/>
           <svg class="upload-icon" viewBox="0 0 46 46" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="7" y="7" width="32" height="32" rx="1"/>
             <path d="M23 30 L23 17"/>
@@ -941,7 +1230,7 @@
             <path d="M15 36 L31 36"/>
           </svg>
           <p class="upload-main">拖拽图片至此，或点击选取</p>
-          <span class="upload-sub">JPG · PNG · WebP · 最大 10 MB</span>
+          <span class="upload-sub">支持批量上传 · JPG · PNG · WebP · 单张最大 10 MB</span>
         </div>
 
         <div class="upload-info">
@@ -951,9 +1240,8 @@
             <circle cx="10" cy="6.5" r=".6" fill="currentColor" stroke="none"/>
           </svg>
           <p class="upload-info-text">
-            上传清晰的单件物品图片以获得最佳结果。
-            模型基于 <strong>ConvNeXt Tiny</strong> 架构训练，输入尺寸 384×384，
-            支持识别<strong>电池、纸板、玻璃、金属、塑料</strong>等十类常见垃圾。
+            支持<strong>单张或批量上传</strong>，批量识别后以图卡形式展示每张结果，并生成汇总报告。
+            模型基于 <strong>ConvNeXt Tiny</strong> 架构，识别十类常见垃圾。
           </p>
         </div>
 
@@ -963,8 +1251,8 @@
         </div>
       </div>
 
-      <!-- Right: result -->
-      <div class="col">
+      <!-- Right: single result -->
+      <div class="col" id="single-col">
         <div class="col-header">
           <div class="col-num">2</div>
           <span class="col-title">识别结果</span>
@@ -976,7 +1264,7 @@
             <path d="M21 14 L21 21"/>
             <circle cx="21" cy="27" r=".8" fill="currentColor" stroke="none"/>
           </svg>
-          <p>上传一张图片，AI 模型将即时识别垃圾类别并显示完整分析结果。</p>
+          <p>上传图片后，AI 将即时识别类别并显示完整分析。支持批量上传多张。</p>
         </div>
 
         <div class="spinner-wrap hidden" id="spinner">
@@ -1010,7 +1298,6 @@
               </div>
             </div>
           </div>
-
           <div class="res-tip" id="res-tip">
             <svg class="tip-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
               <path d="M8 2 C8 2,3 4,3 9 C3 12.5,5.5 14,8 14 C10.5 14,13 12.5,13 9 C13 4,8 2,8 2Z"/>
@@ -1018,7 +1305,6 @@
             </svg>
             <span id="res-tip-text"></span>
           </div>
-
           <div class="res-section">
             <p class="res-section-title">视觉相似度排序 · Top 3</p>
             <div class="topk-list" id="topk-list"></div>
@@ -1026,34 +1312,77 @@
               模型以 Softmax 概率衡量各类别相似度——数值越高，说明图像在视觉特征空间中与该类越接近。
             </div>
           </div>
-
           <div class="res-section" id="res-metrics-section">
             <p class="res-section-title">此类别测试集指标</p>
             <div class="res-metrics">
-              <div class="metric-item">
-                <span class="metric-label">Precision 精确率</span>
-                <span class="metric-value" id="m-precision">—</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">Recall 召回率</span>
-                <span class="metric-value" id="m-recall">—</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">F1-Score</span>
-                <span class="metric-value" id="m-f1">—</span>
-              </div>
-              <div class="metric-item">
-                <span class="metric-label">ROC AUC</span>
-                <span class="metric-value" id="m-auc">—</span>
-              </div>
+              <div class="metric-item"><span class="metric-label">Precision 精确率</span><span class="metric-value" id="m-precision">—</span></div>
+              <div class="metric-item"><span class="metric-label">Recall 召回率</span><span class="metric-value" id="m-recall">—</span></div>
+              <div class="metric-item"><span class="metric-label">F1-Score</span><span class="metric-value" id="m-f1">—</span></div>
+              <div class="metric-item"><span class="metric-label">ROC AUC</span><span class="metric-value" id="m-auc">—</span></div>
             </div>
           </div>
-
           <div class="res-meta" id="res-meta"></div>
         </div>
       </div>
 
     </div><!-- .main-grid -->
+
+    <!-- Batch results (full-width, shown when multiple files) -->
+    <div class="batch-section hidden" id="batch-section">
+      <div class="batch-section-header">
+        <div>
+          <div class="col-header" style="border:none;padding:0;margin:0">
+            <div class="col-num">2</div>
+            <span class="col-title">批量识别结果</span>
+          </div>
+          <p class="batch-count" id="batch-count" style="margin-top:6px"></p>
+        </div>
+        <button class="batch-reset-btn" id="batch-reset-btn">重新上传</button>
+      </div>
+
+      <!-- Progress (during processing) -->
+      <div class="batch-progress-wrap hidden" id="batch-progress-wrap">
+        <div class="batch-progress-label">
+          <span>正在识别…</span>
+          <span id="batch-progress-text">0 / 0</span>
+        </div>
+        <div class="batch-progress-track">
+          <div class="batch-progress-fill" id="batch-progress-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Image cards grid -->
+      <div class="batch-grid" id="batch-grid"></div>
+
+      <!-- Summary table -->
+      <div class="summary-wrap hidden" id="summary-wrap">
+        <div class="summary-header">
+          <span class="summary-title">— 识别汇总报告</span>
+          <button class="summary-export-btn" id="export-btn">导出 CSV</button>
+        </div>
+        <div class="summary-table-wrap">
+          <table class="summary-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>图片</th>
+                <th>文件名</th>
+                <th>识别类别</th>
+                <th>英文</th>
+                <th>信心度</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1</th>
+                <th>ROC AUC</th>
+                <th>处理时间</th>
+              </tr>
+            </thead>
+            <tbody id="summary-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div><!-- .main-wrap -->
 
 </div><!-- .page -->
@@ -1150,8 +1479,12 @@ const placeholder = $("placeholder");
 const spinner     = $("spinner");
 const errorBox    = $("error-box");
 const resultCard  = $("result-card");
+const singleCol   = $("single-col");
+const batchSection = $("batch-section");
 let objectUrl = null;
+let _batchResults = []; // for CSV export
 
+// ── Single result helpers ───────────────────
 function showOnly(...els) {
   [placeholder, spinner, errorBox, resultCard].forEach(e =>
     e.classList.toggle("hidden", !els.includes(e))
@@ -1161,40 +1494,54 @@ function showOnly(...els) {
 function resetUI() {
   if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
   uploadZone.classList.remove("hidden");
-  $("preview-wrap").classList.add("hidden");
+  previewWrap.classList.add("hidden");
+  singleCol.classList.remove("hidden");
+  batchSection.classList.add("hidden");
+  $("batch-grid").innerHTML = "";
+  $("summary-tbody").innerHTML = "";
+  $("summary-wrap").classList.add("hidden");
+  $("batch-progress-wrap").classList.add("hidden");
   showOnly(placeholder);
+  _batchResults = [];
 }
 
-// ── File handling ───────────────────────────
+// ── File validation ─────────────────────────
 const ACCEPTED = new Set(["image/jpeg","image/png","image/webp"]);
 
-function handleFile(file) {
-  if (!ACCEPTED.has(file.type)) { alert("请上传 JPG、PNG 或 WebP 格式的图片。"); return; }
-  if (file.size > 10*1024*1024) { alert("文件大小不得超过 10 MB。"); return; }
+function validateFile(file) {
+  if (!ACCEPTED.has(file.type)) return "仅支持 JPG/PNG/WebP 格式";
+  if (file.size > 10*1024*1024) return "文件超过 10 MB";
+  return null;
+}
+
+// ── Predict single file ─────────────────────
+async function runPredict(file) {
+  const form = new FormData();
+  form.append("file", file);
+  const r = await fetch(`${API}/predict`, { method:"POST", body:form });
+  const d = await r.json();
+  if (!d.success) throw new Error(d.error?.message ?? "识别失败");
+  return d;
+}
+
+// ── SINGLE MODE ─────────────────────────────
+function handleSingle(file) {
   if (objectUrl) URL.revokeObjectURL(objectUrl);
   objectUrl = URL.createObjectURL(file);
   $("preview-img").src = objectUrl;
   uploadZone.classList.add("hidden");
   previewWrap.classList.remove("hidden");
+  singleCol.classList.remove("hidden");
+  batchSection.classList.add("hidden");
   showOnly(spinner);
-  runPredict(file);
-}
 
-async function runPredict(file) {
-  const form = new FormData();
-  form.append("file", file);
-  try {
-    const r = await fetch(`${API}/predict`, { method:"POST", body:form });
-    const d = await r.json();
-    if (!d.success) throw new Error(d.error?.message ?? "识别失败");
-    renderResult(d);
-  } catch(e) {
-    $("error-msg").textContent = e.message || "无法连接至后端，请确认服务器已启动（port 8000）。";
+  runPredict(file).then(renderSingleResult).catch(e => {
+    $("error-msg").textContent = e.message || "无法连接后端（port 8000）";
     showOnly(errorBox);
-  }
+  });
 }
 
-function renderResult(data) {
+function renderSingleResult(data) {
   const cls = data.predicted_class;
   const cfg = CATS[cls] ?? { zh:cls, en:cls, color:"#5A8050", tip:"", auc:null };
   const met = METRICS[cls];
@@ -1207,9 +1554,8 @@ function renderResult(data) {
   $("res-bar").style.width  = pct + "%";
   $("res-bar").style.background = cfg.color;
 
-  const tipEl = $("res-tip");
   $("res-tip-text").textContent = cfg.tip || "";
-  tipEl.classList.toggle("hidden", !cfg.tip);
+  $("res-tip").classList.toggle("hidden", !cfg.tip);
 
   const list = $("topk-list");
   list.innerHTML = "";
@@ -1242,13 +1588,189 @@ function renderResult(data) {
   }
 
   $("res-meta").innerHTML =
-    `<span>处理时间 ${data.processing_ms} ms</span>` +
-    `<span style="opacity:.35">·</span>` +
-    `<span>${data.model_version}</span>` +
-    `<span style="opacity:.35">·</span>` +
+    `<span>处理时间 ${data.processing_ms} ms</span><span style="opacity:.35"> · </span>` +
+    `<span>${data.model_version}</span><span style="opacity:.35"> · </span>` +
     `<span>REQ ${data.request_id}</span>`;
 
   showOnly(resultCard);
+}
+
+// ── BATCH MODE ───────────────────────────────
+async function handleBatch(files) {
+  uploadZone.classList.add("hidden");
+  previewWrap.classList.add("hidden");
+  singleCol.classList.add("hidden");
+  batchSection.classList.remove("hidden");
+  $("batch-grid").innerHTML = "";
+  $("summary-tbody").innerHTML = "";
+  $("summary-wrap").classList.add("hidden");
+  $("batch-progress-wrap").classList.remove("hidden");
+  $("batch-count").textContent = `共 ${files.length} 张图片`;
+  _batchResults = [];
+
+  // Pre-create card placeholders
+  const grid = $("batch-grid");
+  const placeholders = files.map((file, i) => {
+    const url = URL.createObjectURL(file);
+    const card = document.createElement("div");
+    card.className = "batch-item";
+    card.id = `batch-item-${i}`;
+    card.innerHTML = `
+      <div class="batch-item-img-wrap">
+        <img class="batch-item-img" src="${url}" alt="${file.name}"/>
+        <div style="position:absolute;inset:0;background:rgba(234,228,211,.6);display:flex;align-items:center;justify-content:center" id="batch-overlay-${i}">
+          <div class="spinner-ring" style="width:28px;height:28px;border-width:1.5px"></div>
+        </div>
+      </div>
+      <p class="batch-item-filename">${file.name}</p>
+      <div id="batch-body-${i}"></div>
+    `;
+    grid.appendChild(card);
+    return { card, url };
+  });
+
+  // Process sequentially (avoid overloading CPU-only backend)
+  for (let i = 0; i < files.length; i++) {
+    $("batch-progress-text").textContent = `${i} / ${files.length}`;
+    $("batch-progress-fill").style.width = `${(i / files.length) * 100}%`;
+
+    const file = files[i];
+    const overlay = $(`batch-overlay-${i}`);
+    const body    = $(`batch-body-${i}`);
+
+    try {
+      const data = await runPredict(file);
+      const cls  = data.predicted_class;
+      const cfg  = CATS[cls] ?? { zh:cls, en:cls, color:"#5A8050", tip:"", auc:null };
+      const met  = METRICS[cls];
+      const pct  = (data.confidence*100).toFixed(1);
+
+      // Remove loading overlay
+      overlay.remove();
+
+      // Add accent bar
+      const accent = document.createElement("div");
+      accent.className = "batch-item-accent";
+      accent.style.background = cfg.color;
+      placeholders[i].card.querySelector(".batch-item-img-wrap").after(accent);
+
+      // Fill body
+      const topKRows = data.top_k.map((item, r) => {
+        const c = CATS[item.class] ?? { zh:item.class, color:"#5A8050" };
+        const s = (item.score*100).toFixed(1);
+        return `<div class="batch-item-topk-row">
+          <span class="batch-item-topk-name">${c.zh}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${s}%;background:${r===0?cfg.color:'#B2CCA4'}"></div></div>
+          <span class="batch-item-topk-score">${s}%</span>
+        </div>`;
+      }).join("");
+
+      body.innerHTML = `
+        <p class="batch-item-class">${cfg.zh}</p>
+        <p class="batch-item-en">${cfg.en}</p>
+        <div class="batch-item-conf-row">
+          <span class="batch-item-conf-pct" style="color:${cfg.color}">${pct}%</span>
+          <div class="conf-track" style="flex:1"><div class="conf-fill" style="width:${pct}%;background:${cfg.color}"></div></div>
+        </div>
+        <div class="batch-item-topk">${topKRows}</div>
+        ${met ? `<div class="batch-item-metrics">
+          <div class="batch-metric"><span class="batch-metric-label">Precision</span><span class="batch-metric-val">${(met.precision*100).toFixed(1)}%</span></div>
+          <div class="batch-metric"><span class="batch-metric-label">Recall</span><span class="batch-metric-val">${(met.recall*100).toFixed(1)}%</span></div>
+          <div class="batch-metric"><span class="batch-metric-label">F1-Score</span><span class="batch-metric-val">${(met.f1*100).toFixed(1)}%</span></div>
+          <div class="batch-metric"><span class="batch-metric-label">ROC AUC</span><span class="batch-metric-val">${cfg.auc ? cfg.auc.toFixed(4) : '—'}</span></div>
+        </div>` : ''}
+      `;
+
+      _batchResults.push({ i: i+1, file: file.name, url: placeholders[i].url, data, cfg, met });
+
+    } catch(e) {
+      overlay.remove();
+      body.innerHTML = `<p class="batch-item-error">识别失败：${e.message}</p>`;
+      _batchResults.push({ i: i+1, file: file.name, url: placeholders[i].url, error: e.message });
+    }
+  }
+
+  // Done
+  $("batch-progress-text").textContent = `${files.length} / ${files.length}`;
+  $("batch-progress-fill").style.width = "100%";
+  setTimeout(() => $("batch-progress-wrap").classList.add("hidden"), 600);
+
+  // Build summary table
+  buildSummaryTable();
+}
+
+function buildSummaryTable() {
+  const tbody = $("summary-tbody");
+  tbody.innerHTML = "";
+  _batchResults.forEach(row => {
+    const tr = document.createElement("tr");
+    if (row.error) {
+      tr.innerHTML = `
+        <td class="td-mono">${row.i}</td>
+        <td><img class="td-thumb" src="${row.url}" alt=""/></td>
+        <td class="td-mono" colspan="9" style="color:#b85c3a;font-style:italic">识别失败：${row.error}</td>
+      `;
+    } else {
+      const { data, cfg, met } = row;
+      const pct = (data.confidence*100).toFixed(1);
+      const color = cfg.color;
+      tr.innerHTML = `
+        <td class="td-mono">${row.i}</td>
+        <td><img class="td-thumb" src="${row.url}" alt=""/></td>
+        <td class="td-mono" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${row.file}</td>
+        <td class="td-class">${cfg.zh}</td>
+        <td style="font-family:'Fraunces',serif;font-style:italic;color:var(--green-mid)">${cfg.en}</td>
+        <td class="td-conf">
+          <div class="conf-badge">
+            <span class="conf-dot" style="background:${color}"></span>
+            <span style="color:${color}">${pct}%</span>
+          </div>
+        </td>
+        <td class="td-mono">${met ? (met.precision*100).toFixed(1)+'%' : '—'}</td>
+        <td class="td-mono">${met ? (met.recall*100).toFixed(1)+'%' : '—'}</td>
+        <td class="td-mono">${met ? (met.f1*100).toFixed(1)+'%' : '—'}</td>
+        <td class="td-mono">${cfg.auc ? cfg.auc.toFixed(4) : '—'}</td>
+        <td class="td-mono">${data.processing_ms} ms</td>
+      `;
+    }
+    tbody.appendChild(tr);
+  });
+  $("summary-wrap").classList.remove("hidden");
+}
+
+// ── CSV export ──────────────────────────────
+function exportCSV() {
+  const header = ["#","文件名","识别类别","英文","信心度(%)","Precision","Recall","F1","ROC_AUC","处理时间(ms)"];
+  const rows = _batchResults.map(row => {
+    if (row.error) return [row.i, row.file, "ERROR", "", "", "", "", "", "", ""];
+    const { data, cfg, met } = row;
+    return [
+      row.i, row.file, cfg.zh, cfg.en,
+      (data.confidence*100).toFixed(2),
+      met ? (met.precision*100).toFixed(2) : "",
+      met ? (met.recall*100).toFixed(2) : "",
+      met ? (met.f1*100).toFixed(2) : "",
+      cfg.auc ? cfg.auc.toFixed(4) : "",
+      data.processing_ms,
+    ];
+  });
+  const csv = [header, ...rows].map(r => r.map(v => `"${v}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["﻿"+csv], { type:"text/csv;charset=utf-8" }));
+  a.download = `garbage_classification_${Date.now()}.csv`;
+  a.click();
+}
+
+// ── Entry point ─────────────────────────────
+function handleFiles(files) {
+  const valid = Array.from(files).filter(f => {
+    const err = validateFile(f);
+    if (err) { console.warn(f.name, err); return false; }
+    return true;
+  });
+  if (!valid.length) { alert("没有可处理的图片文件。"); return; }
+  if (valid.length === 1) handleSingle(valid[0]);
+  else handleBatch(valid);
 }
 
 // ── Events ──────────────────────────────────
@@ -1258,13 +1780,15 @@ uploadZone.addEventListener("dragover", e => { e.preventDefault(); uploadZone.cl
 uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("drag-over"));
 uploadZone.addEventListener("drop", e => {
   e.preventDefault(); uploadZone.classList.remove("drag-over");
-  const f = e.dataTransfer.files[0]; if (f) handleFile(f);
+  if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
 });
 fileInput.addEventListener("change", () => {
-  const f = fileInput.files[0]; if (f) { handleFile(f); fileInput.value=""; }
+  if (fileInput.files.length) { handleFiles(fileInput.files); fileInput.value=""; }
 });
 $("reset-btn").addEventListener("click", resetUI);
 $("retry-btn").addEventListener("click", resetUI);
+$("batch-reset-btn").addEventListener("click", resetUI);
+$("export-btn").addEventListener("click", exportCSV);
 </script>
 </body>
 </html>
