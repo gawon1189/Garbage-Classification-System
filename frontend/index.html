@@ -1615,6 +1615,8 @@
                 <th>识别类别</th>
                 <th>英文</th>
                 <th>信心度</th>
+                <th id="city-col-header">当地分类</th>
+                <th>回收说明</th>
                 <th>Precision</th>
                 <th>Recall</th>
                 <th>F1</th>
@@ -1911,6 +1913,18 @@ async function handleBatch(files) {
         </div>`;
       }).join("");
 
+      const cityInfo = _currentCity ? getCityClassification(_currentCity, data.predicted_class) : null;
+      const cityBlock = cityInfo ? `
+        <div style="padding:10px 14px 12px;border-top:1px solid var(--border);background:rgba(43,74,40,.04)">
+          <div style="font-family:'Courier Prime',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green-sage);margin-bottom:6px">${_currentCity} · 当地分类</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="width:14px;height:14px;border-radius:50%;background:${cityInfo.binHex};flex-shrink:0;display:inline-block"></span>
+            <span style="font-family:'Noto Serif SC',serif;font-weight:500;font-size:.92rem;color:var(--ink)">${cityInfo.category}</span>
+            <span style="font-family:'Courier Prime',monospace;font-size:.65rem;color:var(--green-sage)">${cityInfo.binLabel}</span>
+          </div>
+          <p style="font-size:.78rem;line-height:1.6;color:var(--ink-mid)">${cityInfo.instruction}</p>
+        </div>` : '';
+
       body.innerHTML = `
         <p class="batch-item-class">${cfg.zh}</p>
         <p class="batch-item-en">${cfg.en}</p>
@@ -1925,6 +1939,7 @@ async function handleBatch(files) {
           <div class="batch-metric"><span class="batch-metric-label">F1-Score</span><span class="batch-metric-val">${(met.f1*100).toFixed(1)}%</span></div>
           <div class="batch-metric"><span class="batch-metric-label">ROC AUC</span><span class="batch-metric-val">${cfg.auc ? cfg.auc.toFixed(4) : '—'}</span></div>
         </div>` : ''}
+        ${cityBlock}
       `;
 
       _batchResults.push({ i: i+1, file: file.name, url: placeholders[i].url, data, cfg, met });
@@ -1948,22 +1963,44 @@ async function handleBatch(files) {
 function buildSummaryTable() {
   const tbody = $("summary-tbody");
   tbody.innerHTML = "";
+
+  // Update city column header
+  const cityHeader = $("city-col-header");
+  if (cityHeader) cityHeader.textContent = _currentCity ? `${_currentCity} 分类` : "当地分类";
+
   _batchResults.forEach(row => {
     const tr = document.createElement("tr");
     if (row.error) {
       tr.innerHTML = `
         <td class="td-mono">${row.i}</td>
         <td><img class="td-thumb" src="${row.url}" alt=""/></td>
-        <td class="td-mono" colspan="9" style="color:#b85c3a;font-style:italic">识别失败：${row.error}</td>
+        <td class="td-mono" colspan="11" style="color:#b85c3a;font-style:italic">识别失败：${row.error}</td>
       `;
     } else {
       const { data, cfg, met } = row;
       const pct = (data.confidence*100).toFixed(1);
       const color = cfg.color;
+
+      // City classification
+      const ci = _currentCity ? getCityClassification(_currentCity, data.predicted_class) : null;
+      const cityTd = ci
+        ? `<td>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="width:10px;height:10px;border-radius:50%;background:${ci.binHex};flex-shrink:0;display:inline-block"></span>
+              <span class="td-class" style="font-size:.82rem">${ci.category}</span>
+            </div>
+            <div class="td-mono" style="font-size:.62rem;color:var(--green-sage);margin-top:2px">${ci.binLabel}</div>
+           </td>`
+        : `<td class="td-mono" style="color:var(--green-sage);font-style:italic">未选择城市</td>`;
+
+      const instrTd = ci
+        ? `<td style="font-size:.78rem;line-height:1.5;color:var(--ink-mid);max-width:240px">${ci.instruction}</td>`
+        : `<td class="td-mono" style="color:var(--green-sage)">—</td>`;
+
       tr.innerHTML = `
         <td class="td-mono">${row.i}</td>
         <td><img class="td-thumb" src="${row.url}" alt=""/></td>
-        <td class="td-mono" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${row.file}</td>
+        <td class="td-mono" style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${row.file}</td>
         <td class="td-class">${cfg.zh}</td>
         <td style="font-family:'Fraunces',serif;font-style:italic;color:var(--green-mid)">${cfg.en}</td>
         <td class="td-conf">
@@ -1972,6 +2009,8 @@ function buildSummaryTable() {
             <span style="color:${color}">${pct}%</span>
           </div>
         </td>
+        ${cityTd}
+        ${instrTd}
         <td class="td-mono">${met ? (met.precision*100).toFixed(1)+'%' : '—'}</td>
         <td class="td-mono">${met ? (met.recall*100).toFixed(1)+'%' : '—'}</td>
         <td class="td-mono">${met ? (met.f1*100).toFixed(1)+'%' : '—'}</td>
@@ -1986,13 +2025,16 @@ function buildSummaryTable() {
 
 // ── CSV export ──────────────────────────────
 function exportCSV() {
-  const header = ["#","文件名","识别类别","英文","信心度(%)","Precision","Recall","F1","ROC_AUC","处理时间(ms)"];
+  const header = ["#","文件名","识别类别","英文","信心度(%)",_currentCity?`${_currentCity}_分类`:"当地分类","回收说明","Precision","Recall","F1","ROC_AUC","处理时间(ms)"];
   const rows = _batchResults.map(row => {
-    if (row.error) return [row.i, row.file, "ERROR", "", "", "", "", "", "", ""];
+    if (row.error) return [row.i, row.file, "ERROR", "", "", "", "", "", "", "", "", ""];
     const { data, cfg, met } = row;
+    const ci = _currentCity ? getCityClassification(_currentCity, data.predicted_class) : null;
     return [
       row.i, row.file, cfg.zh, cfg.en,
       (data.confidence*100).toFixed(2),
+      ci ? ci.category : "",
+      ci ? ci.instruction : "",
       met ? (met.precision*100).toFixed(2) : "",
       met ? (met.recall*100).toFixed(2) : "",
       met ? (met.f1*100).toFixed(2) : "",
@@ -2221,8 +2263,13 @@ if (_currentCity) citySelect.value = _currentCity;
 citySelect.addEventListener("change", () => {
   _currentCity = citySelect.value;
   localStorage.setItem("gc_city", _currentCity);
+  // Update single result guide
   if (_currentClass) renderCityGuide(_currentCity, _currentClass);
   else $("city-guide").classList.add("hidden");
+  // Rebuild batch summary if visible
+  if (_batchResults.length > 0 && !$("summary-wrap").classList.contains("hidden")) {
+    buildSummaryTable();
+  }
 });
 
 // Hook into renderSingleResult to also update city guide
