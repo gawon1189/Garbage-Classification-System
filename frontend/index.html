@@ -1116,6 +1116,167 @@
       border-radius: 50%;
       flex-shrink: 0;
     }
+
+    /* ════════════════════════════════════════
+       CITY SELECTOR STRIP
+    ════════════════════════════════════════ */
+    .city-strip {
+      background: var(--green-deep);
+      border-bottom: 1px solid rgba(178,204,164,.15);
+      margin: 0 -28px;
+    }
+    .city-strip-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 10px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .city-strip-label {
+      font-family: "Courier Prime", monospace;
+      font-size: .68rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--green-pale);
+      opacity: .75;
+      flex-shrink: 0;
+    }
+    .city-select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: rgba(255,255,255,.08) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B2CCA4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+      border: 1px solid rgba(178,204,164,.25);
+      color: var(--paper);
+      padding: 6px 36px 6px 14px;
+      font-family: "Noto Serif SC", serif;
+      font-size: .88rem;
+      cursor: pointer;
+      border-radius: 2px;
+      min-width: 160px;
+      transition: border-color .2s;
+    }
+    .city-select:focus { outline: none; border-color: var(--green-pale); }
+    .city-select option { background: var(--green-deep); color: var(--paper); }
+    .city-select optgroup { color: var(--green-pale); font-style: normal; }
+
+    .city-strip-hint {
+      font-family: "Courier Prime", monospace;
+      font-size: .65rem;
+      letter-spacing: .08em;
+      color: rgba(178,204,164,.5);
+      flex: 1;
+    }
+
+    /* ════════════════════════════════════════
+       CITY GUIDE PANEL
+    ════════════════════════════════════════ */
+    .city-guide {
+      border: 1px solid var(--border-mid);
+      background: rgba(255,255,255,.22);
+      overflow: hidden;
+    }
+
+    .city-guide-top {
+      padding: 16px 22px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .city-guide-city-name {
+      font-family: "Fraunces", serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      color: var(--ink-mid);
+    }
+
+    .city-guide-reg {
+      font-family: "Courier Prime", monospace;
+      font-size: .62rem;
+      letter-spacing: .06em;
+      color: var(--green-sage);
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    .city-guide-bin-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(43,74,40,.03);
+    }
+
+    .bin-circle {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255,255,255,.2);
+    }
+
+    .bin-circle svg { width: 20px; height: 20px; }
+
+    .bin-category-name {
+      font-family: "Noto Serif SC", serif;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .bin-color-hint {
+      font-family: "Courier Prime", monospace;
+      font-size: .68rem;
+      letter-spacing: .06em;
+      color: var(--green-sage);
+      margin-top: 2px;
+    }
+
+    .city-guide-instruction {
+      padding: 14px 22px;
+      font-size: .9rem;
+      line-height: 1.75;
+      color: var(--ink-mid);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .city-guide-notes {
+      padding: 12px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .city-note-item {
+      display: flex;
+      gap: 8px;
+      font-size: .82rem;
+      line-height: 1.55;
+      color: var(--ink-mid);
+      font-style: italic;
+    }
+
+    .city-note-dot {
+      width: 4px; height: 4px;
+      background: var(--green-sage);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 7px;
+    }
+
+    /* Bin colors */
+    .bin-blue   { background: #2A5F8A; }
+    .bin-green  { background: #3D6438; }
+    .bin-red    { background: #B85C3A; }
+    .bin-brown  { background: #7A4520; }
+    .bin-black  { background: #2A2A2A; }
+    .bin-gray   { background: #5A5A5A; }
   </style>
 </head>
 <body>
@@ -1141,6 +1302,69 @@
       <span id="status-text">connecting</span>
     </div>
   </header>
+</div>
+
+<!-- ══ CITY STRIP ════════════════════════════ -->
+<div class="city-strip">
+  <div class="city-strip-inner">
+    <label class="city-strip-label" for="city-select">所在城市</label>
+    <select class="city-select" id="city-select">
+      <option value="">选择城市以查看当地规范</option>
+      <optgroup label="──── 华北 ────">
+        <option value="北京">北京</option>
+        <option value="天津">天津</option>
+        <option value="石家庄">石家庄</option>
+        <option value="太原">太原</option>
+        <option value="呼和浩特">呼和浩特</option>
+      </optgroup>
+      <optgroup label="──── 东北 ────">
+        <option value="哈尔滨">哈尔滨</option>
+        <option value="沈阳">沈阳</option>
+        <option value="大连">大连</option>
+        <option value="长春">长春</option>
+      </optgroup>
+      <optgroup label="──── 华东 ────">
+        <option value="上海">上海</option>
+        <option value="南京">南京</option>
+        <option value="杭州">杭州</option>
+        <option value="宁波">宁波</option>
+        <option value="无锡">无锡</option>
+        <option value="苏州">苏州</option>
+        <option value="合肥">合肥</option>
+        <option value="福州">福州</option>
+        <option value="厦门">厦门</option>
+        <option value="青岛">青岛</option>
+        <option value="济南">济南</option>
+        <option value="南昌">南昌</option>
+      </optgroup>
+      <optgroup label="──── 华中 ────">
+        <option value="武汉">武汉</option>
+        <option value="长沙">长沙</option>
+        <option value="郑州">郑州</option>
+      </optgroup>
+      <optgroup label="──── 华南 ────">
+        <option value="广州">广州</option>
+        <option value="深圳">深圳</option>
+        <option value="南宁">南宁</option>
+        <option value="海口">海口</option>
+      </optgroup>
+      <optgroup label="──── 西南 ────">
+        <option value="成都">成都</option>
+        <option value="重庆">重庆</option>
+        <option value="贵阳">贵阳</option>
+        <option value="昆明">昆明</option>
+        <option value="拉萨">拉萨</option>
+      </optgroup>
+      <optgroup label="──── 西北 ────">
+        <option value="西安">西安</option>
+        <option value="兰州">兰州</option>
+        <option value="乌鲁木齐">乌鲁木齐</option>
+        <option value="银川">银川</option>
+        <option value="西宁">西宁</option>
+      </optgroup>
+    </select>
+    <span class="city-strip-hint">选择后识别结果将显示当地垃圾分类规范</span>
+  </div>
 </div>
 
 <!-- ══ HERO ═════════════════════════════════ -->
@@ -1323,6 +1547,27 @@
           </div>
           <div class="res-meta" id="res-meta"></div>
         </div>
+
+        <!-- City guide (shown after result when city selected) -->
+        <div class="city-guide hidden" id="city-guide">
+          <div class="city-guide-top">
+            <span class="city-guide-city-name" id="cg-city-name"></span>
+            <div class="city-guide-reg" id="cg-reg"></div>
+          </div>
+          <div class="city-guide-bin-row">
+            <div class="bin-circle" id="cg-bin-circle">
+              <svg viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.3" stroke-linecap="round">
+                <path d="M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10"/>
+              </svg>
+            </div>
+            <div>
+              <div class="bin-category-name" id="cg-category"></div>
+              <div class="bin-color-hint" id="cg-bin-hint"></div>
+            </div>
+          </div>
+          <div class="city-guide-instruction" id="cg-instruction"></div>
+          <div class="city-guide-notes" id="cg-notes"></div>
+        </div>
       </div>
 
     </div><!-- .main-grid -->
@@ -1501,6 +1746,7 @@ function resetUI() {
   $("summary-tbody").innerHTML = "";
   $("summary-wrap").classList.add("hidden");
   $("batch-progress-wrap").classList.add("hidden");
+  $("city-guide").classList.add("hidden");
   showOnly(placeholder);
   _batchResults = [];
 }
@@ -1535,7 +1781,7 @@ function handleSingle(file) {
   batchSection.classList.add("hidden");
   showOnly(spinner);
 
-  runPredict(file).then(renderSingleResult).catch(e => {
+  runPredict(file).then(data => { renderSingleResult(data); _currentClass = data.predicted_class; renderCityGuide(_currentCity, _currentClass); }).catch(e => {
     $("error-msg").textContent = e.message || "无法连接后端（port 8000）";
     showOnly(errorBox);
   });
@@ -1789,6 +2035,206 @@ $("reset-btn").addEventListener("click", resetUI);
 $("retry-btn").addEventListener("click", resetUI);
 $("batch-reset-btn").addEventListener("click", resetUI);
 $("export-btn").addEventListener("click", exportCSV);
+
+// ════════════════════════════════════════════
+//  CITY CLASSIFICATION DATABASE
+// ════════════════════════════════════════════
+// food:      local term for kitchen/food waste
+// foodColor: bin color (green | brown)
+// other:     local term for residual waste
+// otherColor:bin color (black | gray)
+// battery:   'hazardous' | 'guangzhou' (dry cells → other)
+// recycColor:'blue' | 'green' (银川 anomaly)
+// regulation: name of local ordinance
+// year: regulation year
+// notes: city-specific rules shown to user
+
+const CITY_DB = {
+  "北京":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《北京市生活垃圾管理条例》", year:2020, notes:["其他垃圾使用灰色桶","可口诀记忆：能卖钱蓝桶，易腐烂绿桶，有毒有害红桶，没人要灰桶"] },
+  "天津":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《天津市生活垃圾管理条例》", year:2020, notes:["天津官方文件标注了精确的Pantone颜色标准"] },
+  "石家庄": { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《石家庄市生活垃圾分类管理条例》", year:2021, notes:[] },
+  "太原":   { food:"易腐垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《太原市生活垃圾分类管理条例》", year:2020, notes:["山西省使用「易腐垃圾」而非「厨余垃圾」","另设大件垃圾、装修垃圾单独处理"] },
+  "呼和浩特":{ food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray", battery:"hazardous", recycColor:"blue", regulation:"《呼和浩特市生活垃圾分类管理办法》", year:2020, notes:["办公/公共场所仅设可回收物与其他垃圾两类桶"] },
+  "哈尔滨": { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《哈尔滨市生活垃圾分类管理条例》", year:2022, notes:["其他垃圾使用灰色桶","饮料纸基复合包装明确列为可回收物"] },
+  "沈阳":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《沈阳市生活垃圾管理条例》", year:2022, notes:["木材类废弃物明确列为可回收物"] },
+  "大连":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《大连市生活垃圾分类管理条例》", year:2019, notes:["其他垃圾使用灰色桶"] },
+  "长春":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《长春市生活垃圾分类管理条例》", year:2021, notes:[] },
+  "上海":   { food:"湿垃圾",   foodColor:"brown", other:"干垃圾",   otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《上海市生活垃圾管理条例》", year:2019, notes:["上海是全国唯一使用棕色桶收集湿垃圾的城市","使用「干垃圾」而非「其他垃圾」","个人违规最高罚款200元，是全国执法最严格的城市","投放前须沥干水分并去除外包装"] },
+  "南京":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《南京市生活垃圾管理条例》", year:2020, notes:["民间也称「湿垃圾/干垃圾」，与上海用法类似"] },
+  "杭州":   { food:"易腐垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《杭州市生活垃圾管理条例》", year:2019, notes:["浙江省使用「易腐垃圾」统一术语","其他垃圾旧版为黄色桶，2020年后更换为灰色"] },
+  "宁波":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《宁波市生活垃圾分类管理条例》", year:2019, notes:["全国最早推行垃圾分类的城市之一（2013年起试点）","电子废弃物及包装材料明确列为可回收物"] },
+  "无锡":   { food:"易腐垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《无锡市城乡生活垃圾分类管理条例》", year:2020, notes:["江苏省内使用「易腐垃圾」的代表城市"] },
+  "苏州":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《苏州市生活垃圾分类管理条例》", year:2019, notes:["分居住区和办公场所分别制定详细指引"] },
+  "合肥":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《合肥市生活垃圾分类管理条例》", year:2020, notes:[] },
+  "福州":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《福州市生活垃圾分类管理条例》", year:2020, notes:[] },
+  "厦门":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《厦门经济特区生活垃圾分类管理办法》", year:2017, notes:["全国首批46个强制分类城市之一（2017年立法）"] },
+  "青岛":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《青岛市生活垃圾分类管理办法》", year:2020, notes:[] },
+  "济南":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《山东省生活垃圾管理条例》", year:2020, notes:[] },
+  "南昌":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《南昌市生活垃圾分类管理条例》", year:2020, notes:["官方文件同样标注了精确Pantone颜色标准"] },
+  "武汉":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《武汉市生活垃圾分类管理办法》", year:2021, notes:["明确禁止在运输过程中混合已分类垃圾"] },
+  "长沙":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《长沙市生活垃圾管理条例》", year:2020, notes:[] },
+  "郑州":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《郑州市城市生活垃圾分类管理办法》", year:2019, notes:[] },
+  "广州":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"guangzhou",  recycColor:"blue", regulation:"《广州市生活垃圾分类管理条例》", year:2018, notes:["⚠️ 广州特别规定：普通干电池（碱性/锌锰型）→ 其他垃圾；充电电池、纽扣电池仍须放入有害垃圾桶","硬骨头、贝壳、玉米棒→ 其他垃圾（而非厨余垃圾）","2023年更新了详细的分类指导目录"] },
+  "深圳":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《深圳市生活垃圾分类管理条例》", year:2020, notes:["深圳地方标准DB4403/T 73-2020明确规定了桶色标准"] },
+  "南宁":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《南宁市生活垃圾分类管理条例》", year:2020, notes:[] },
+  "海口":   { food:"易腐垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《海口市生活垃圾分类管理办法》", year:2018, notes:["海南省使用「易腐垃圾」统一术语"] },
+  "成都":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《成都市生活垃圾管理条例》", year:2021, notes:[] },
+  "重庆":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《重庆市生活垃圾管理条例》", year:2017, notes:[] },
+  "贵阳":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《贵阳市城镇生活垃圾分类管理条例》", year:2022, notes:[] },
+  "昆明":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《昆明市生活垃圾管理条例》", year:2023, notes:["厨余垃圾包含家庭厨余与餐厨两类"] },
+  "拉萨":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《拉萨市城市生活垃圾分类管理办法》", year:2020, notes:["有害垃圾（电池等）建议装入红色袋后再投入红色桶"] },
+  "西安":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"gray",  battery:"hazardous", recycColor:"blue", regulation:"《西安市生活垃圾分类管理办法》", year:2019, notes:["其他垃圾使用灰色桶"] },
+  "兰州":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《甘肃省城市生活垃圾管理条例》", year:2020, notes:["兰州为全国首批46个垃圾分类示范城市之一"] },
+  "乌鲁木齐":{ food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《乌鲁木齐市生活垃圾分类管理办法》", year:2020, notes:["垃圾桶须设置汉维双语标识"] },
+  "银川":   { food:"湿垃圾",   foodColor:"gray",  other:"干垃圾",   otherColor:"blue",  battery:"hazardous", recycColor:"green", regulation:"《宁夏回族自治区固体废物污染环境防治条例》", year:2023, notes:["⚠️ 银川垃圾桶颜色与全国标准相反：绿色=可回收物，蓝色=干垃圾（其他垃圾），以当地实际桶色为准","银川使用「再生资源」称呼可回收物"] },
+  "西宁":   { food:"厨余垃圾", foodColor:"green", other:"其他垃圾", otherColor:"black", battery:"hazardous", recycColor:"blue", regulation:"《西宁市生活垃圾分类管理办法》", year:2018, notes:[] },
+};
+
+const BIN_META = {
+  blue:  { label:"蓝色可回收物桶", hex:"#2A5F8A" },
+  green: { label:"绿色桶", hex:"#3D6438" },
+  red:   { label:"红色有害垃圾桶", hex:"#B85C3A" },
+  brown: { label:"棕色桶", hex:"#7A4520" },
+  black: { label:"黑色桶", hex:"#2A2A2A" },
+  gray:  { label:"灰色桶", hex:"#5A5A5A" },
+};
+
+// Per-class instructions (default, overridden per city)
+const CLASS_INSTRUCTIONS = {
+  battery:    "将电池完整放入专用有害垃圾桶，勿拆解，勿与其他垃圾混合。",
+  biological: "去除外包装，沥干水分后投入指定厨余垃圾桶。",
+  cardboard:  "压扁捆绑后投入可回收物桶；污损或沾油的纸板投入其他垃圾桶。",
+  clothes:    "干净衣物优先捐赠或送至小区旧衣回收箱，破损严重的可投入其他垃圾桶。",
+  glass:      "清洗晾干后投入可回收物桶。破碎玻璃请用厚纸包裹后再投入，避免划伤。",
+  metal:      "清洗后压扁，投入可回收物桶（铁铝罐）。",
+  paper:      "保持干燥，投入可回收物桶。卫生纸、餐巾纸等吸水纸请投入其他垃圾桶。",
+  plastic:    "清洗干净后投入可回收物桶。塑料袋、一次性餐具等请投入其他垃圾桶。",
+  shoes:      "可穿着的鞋子优先送至旧衣回收点，严重破损的投入其他垃圾桶。",
+  trash:      "直接投入其他垃圾桶，无需特殊处理。",
+};
+
+// City-specific overrides for certain waste classes
+const CITY_CLASS_OVERRIDES = {
+  "上海": {
+    biological: "剥去外包装，沥干水分后投入棕色湿垃圾桶。上海规定：投放前须拆袋倒入桶内，塑料袋本身为干垃圾。",
+    trash:      "直接投入黑色干垃圾桶，勿破坏袋体。",
+    cardboard:  "干净纸板投入蓝色可回收物桶；污损纸板投入黑色干垃圾桶。",
+    paper:      "干净纸张投入蓝色可回收物桶；纸巾、餐巾纸投入黑色干垃圾桶。",
+    plastic:    "清洗干净的塑料瓶罐投入蓝色可回收物桶；塑料袋、一次性餐具投入黑色干垃圾桶。",
+  },
+  "广州": {
+    battery: "⚠️ 广州特别规定：日常使用的碱性干电池（5号/7号等）可投入灰色其他垃圾桶；充电电池、纽扣电池须投入红色有害垃圾桶。",
+    biological: "去除外包装，沥干水分后投入绿色厨余垃圾桶。注意：硬骨头、贝壳、玉米棒属于其他垃圾。",
+  },
+  "杭州": {
+    biological: "去除外包装后投入绿色易腐垃圾桶。浙江省统一使用「易腐垃圾」称谓。",
+  },
+  "无锡": { biological: "去除外包装后投入绿色易腐垃圾桶。" },
+  "大连": { biological: "去除外包装后投入绿色厨余（易腐）垃圾桶。" },
+  "太原": { biological: "去除外包装后投入绿色易腐垃圾桶（山西省统一用语）。" },
+  "海口": { biological: "去除外包装后投入绿色易腐垃圾桶（海南省统一用语）。" },
+  "银川": {
+    biological: "投入灰色湿垃圾桶（注：银川灰色桶对应其他城市的绿色厨余桶）。",
+    trash:      "投入蓝色干垃圾桶（注：银川蓝色桶对应其他城市的黑/灰色其他垃圾桶）。",
+    cardboard:  "投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+    clothes: "投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+    glass:   "投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+    metal:   "投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+    paper:   "干净纸张投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+    plastic: "清洗后投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+    shoes:   "可穿着的鞋子投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+  },
+};
+
+// Determine how a waste class maps to a city's category
+function getCityClassification(cityKey, wasteClass) {
+  const city = CITY_DB[cityKey];
+  if (!city) return null;
+
+  let category, colorKey, instruction;
+  const override = CITY_CLASS_OVERRIDES[cityKey]?.[wasteClass];
+  instruction = override || CLASS_INSTRUCTIONS[wasteClass];
+
+  if (wasteClass === 'biological') {
+    category = city.food;
+    colorKey  = city.foodColor;
+  } else if (wasteClass === 'battery') {
+    if (city.battery === 'guangzhou') {
+      // Guangzhou: dry cell → other, rechargeable → hazardous
+      category = "其他垃圾（普通干电池）";
+      colorKey  = city.otherColor;
+    } else {
+      category = "有害垃圾";
+      colorKey  = "red";
+    }
+  } else if (wasteClass === 'trash') {
+    category = city.other;
+    colorKey  = city.otherColor;
+  } else {
+    // recyclables
+    category  = cityKey === '银川' ? "再生资源（可回收物）" : "可回收物";
+    colorKey  = city.recycColor;
+  }
+
+  const binMeta = BIN_META[colorKey] ?? BIN_META.blue;
+  return { category, colorKey, binLabel: binMeta.label, binHex: binMeta.hex, instruction, notes: city.notes, regulation: city.regulation, year: city.year };
+}
+
+// Render city guide panel
+function renderCityGuide(cityKey, wasteClass) {
+  const guide = $("city-guide");
+  if (!cityKey || !wasteClass) { guide.classList.add("hidden"); return; }
+
+  const info = getCityClassification(cityKey, wasteClass);
+  if (!info) { guide.classList.add("hidden"); return; }
+
+  $("cg-city-name").textContent = `${cityKey} · 当地分类规范`;
+  $("cg-reg").innerHTML = `${info.regulation}<br>${info.year} 年施行`;
+
+  const circle = $("cg-bin-circle");
+  circle.className = "bin-circle";
+  circle.style.background = info.binHex;
+
+  $("cg-category").textContent   = info.category;
+  $("cg-bin-hint").textContent   = info.binLabel;
+  $("cg-instruction").textContent = info.instruction;
+
+  const notesEl = $("cg-notes");
+  notesEl.innerHTML = "";
+  info.notes.forEach(n => {
+    const item = document.createElement("div");
+    item.className = "city-note-item";
+    item.innerHTML = `<span class="city-note-dot"></span><span>${n}</span>`;
+    notesEl.appendChild(item);
+  });
+
+  guide.classList.remove("hidden");
+}
+
+// Persist city selection & hook up events
+let _currentCity  = localStorage.getItem("gc_city") || "";
+let _currentClass = null;
+
+const citySelect = $("city-select");
+if (_currentCity) citySelect.value = _currentCity;
+
+citySelect.addEventListener("change", () => {
+  _currentCity = citySelect.value;
+  localStorage.setItem("gc_city", _currentCity);
+  if (_currentClass) renderCityGuide(_currentCity, _currentClass);
+  else $("city-guide").classList.add("hidden");
+});
+
+// Hook into renderSingleResult to also update city guide
+const _origRenderSingle = renderSingleResult;
+// Override: after rendering result, also show city guide
+function renderSingleResultWithCity(data) {
+  _origRenderSingle(data);
+  _currentClass = data.predicted_class;
+  renderCityGuide(_currentCity, _currentClass);
+}
+// Patch the reference in handleSingle
+const _origHandleSingle = handleSingle;
 </script>
 </body>
 </html>
