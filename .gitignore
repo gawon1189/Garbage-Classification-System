@@ -1,14 +1,11 @@
 data/
-model/artifacts/
+model/current/
 *.pt
 *.onnx
 *.h5
 *.pkl
 
 *.zip
-*.pyc
-*.pyo
-*.pyd
 *.pyc
 *.pyo
 *.pyd
@@ -22,17 +19,9 @@ pip-delete-this-directory.txt
 
 .ipynb_checkpoints/
 
-*/.ipynb_checkpoints/
-
 .Rhistory
 *.swp
 *.swo
-.DS_Store
-.DS_Store?
-._*
-Thumbs.db
-*/.ipynb_checkpoints/
-
 .DS_Store
 .DS_Store?
 ._*

@@ -1,0 +1,85 @@
+{
+  "best_val_acc": 0.9169435215946844,
+  "test_loss": 0.7759233765149715,
+  "test_acc": 0.9083969465648855,
+  "classification_report": {
+    "battery": {
+      "precision": 0.9636363636363636,
+      "recall": 0.9814814814814815,
+      "f1-score": 0.9724770642201835,
+      "support": 54.0
+    },
+    "biological": {
+      "precision": 1.0,
+      "recall": 0.9607843137254902,
+      "f1-score": 0.98,
+      "support": 51.0
+    },
+    "cardboard": {
+      "precision": 0.8727272727272727,
+      "recall": 0.8495575221238938,
+      "f1-score": 0.8609865470852018,
+      "support": 113.0
+    },
+    "clothes": {
+      "precision": 1.0,
+      "recall": 0.9882352941176471,
+      "f1-score": 0.9940828402366864,
+      "support": 85.0
+    },
+    "glass": {
+      "precision": 0.9385964912280702,
+      "recall": 0.9224137931034483,
+      "f1-score": 0.9304347826086956,
+      "support": 116.0
+    },
+    "metal": {
+      "precision": 0.9035087719298246,
+      "recall": 0.9363636363636364,
+      "f1-score": 0.9196428571428571,
+      "support": 110.0
+    },
+    "paper": {
+      "precision": 0.8110236220472441,
+      "recall": 0.9196428571428571,
+      "f1-score": 0.8619246861924686,
+      "support": 112.0
+    },
+    "plastic": {
+      "precision": 0.8440366972477065,
+      "recall": 0.8141592920353983,
+      "f1-score": 0.8288288288288288,
+      "support": 113.0
+    },
+    "shoes": {
+      "precision": 1.0,
+      "recall": 0.9764705882352941,
+      "f1-score": 0.9880952380952381,
+      "support": 85.0
+    },
+    "trash": {
+      "precision": 0.875,
+      "recall": 0.8076923076923077,
+      "f1-score": 0.84,
+      "support": 78.0
+    },
+    "accuracy": 0.9083969465648855,
+    "macro avg": {
+      "precision": 0.9208529218816481,
+      "recall": 0.9156801086021454,
+      "f1-score": 0.917647284441016,
+      "support": 917.0
+    },
+    "weighted avg": {
+      "precision": 0.9099002135306046,
+      "recall": 0.9083969465648855,
+      "f1-score": 0.908478461860707,
+      "support": 917.0
+    }
+  },
+  "model": "convnext_tiny",
+  "img_size": 384,
+  "batch_size": 16,
+  "epochs": 20,
+  "seed": 42
+}

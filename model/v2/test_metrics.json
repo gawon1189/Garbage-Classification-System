@@ -1,0 +1,106 @@
+{
+  "version": "v2",
+  "best_val_acc": 0.9324473975636767,
+  "test_loss": 0.2278954309808454,
+  "test_acc": 0.9236641221374046,
+  "roc_auc_macro_ovr": 0.9896568226755831,
+  "roc_auc_weighted_ovr": 0.9888199810654054,
+  "roc_auc_per_class_ovr": {
+    "battery": 0.9996995837088537,
+    "biological": 0.9967848571299189,
+    "cardboard": 0.9751463919341347,
+    "clothes": 1.0,
+    "glass": 0.9950600542425416,
+    "metal": 0.9969922271037512,
+    "paper": 0.987466725820763,
+    "plastic": 0.9800444679258574,
+    "shoes": 1.0,
+    "trash": 0.9653739188900095
+  },
+  "classification_report": {
+    "battery": {
+      "precision": 0.9629629629629629,
+      "recall": 0.9629629629629629,
+      "f1-score": 0.9629629629629629,
+      "support": 54.0
+    },
+    "biological": {
+      "precision": 0.9795918367346939,
+      "recall": 0.9411764705882353,
+      "f1-score": 0.96,
+      "support": 51.0
+    },
+    "cardboard": {
+      "precision": 0.8793103448275862,
+      "recall": 0.9026548672566371,
+      "f1-score": 0.8908296943231441,
+      "support": 113.0
+    },
+    "clothes": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 85.0
+    },
+    "glass": {
+      "precision": 0.9553571428571429,
+      "recall": 0.9224137931034483,
+      "f1-score": 0.9385964912280702,
+      "support": 116.0
+    },
+    "metal": {
+      "precision": 0.8907563025210085,
+      "recall": 0.9636363636363636,
+      "f1-score": 0.925764192139738,
+      "support": 110.0
+    },
+    "paper": {
+      "precision": 0.865546218487395,
+      "recall": 0.9196428571428571,
+      "f1-score": 0.8917748917748918,
+      "support": 112.0
+    },
+    "plastic": {
+      "precision": 0.8703703703703703,
+      "recall": 0.831858407079646,
+      "f1-score": 0.8506787330316742,
+      "support": 113.0
+    },
+    "shoes": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 85.0
+    },
+    "trash": {
+      "precision": 0.9285714285714286,
+      "recall": 0.8333333333333334,
+      "f1-score": 0.8783783783783784,
+      "support": 78.0
+    },
+    "accuracy": 0.9236641221374046,
+    "macro avg": {
+      "precision": 0.933246660733259,
+      "recall": 0.9277679055103485,
+      "f1-score": 0.9298985343838859,
+      "support": 917.0
+    },
+    "weighted avg": {
+      "precision": 0.9245883034228327,
+      "recall": 0.9236641221374046,
+      "f1-score": 0.9235049158137657,
+      "support": 917.0
+    }
+  },
+  "model": "convnext_tiny",
+  "img_size": 384,
+  "batch_size": 16,
+  "epochs_requested": 25,
+  "epochs_ran": 25,
+  "seed": 42,
+  "loss": "focal",
+  "hard_class_weight": 1.8,
+  "label_smoothing": 0.08,
+  "supplement_dir": "/kaggle/working/Garbage-Classification-System/supplement_candidates",
+  "supplement_count": 583
+}
