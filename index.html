@@ -1,0 +1,3430 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>垃圾分类识别系统</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400;1,9..144,500&family=Noto+Serif+SC:wght@300;400;500&family=Courier+Prime:ital@0;1&display=swap"
+            rel="stylesheet"
+        />
+
+        <style>
+            /* ── Reset ─────────────────────────────── */
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* ── Tokens ────────────────────────────── */
+            :root {
+                --paper: #eae4d3;
+                --paper-warm: #e0d9c6;
+                --paper-mid: #d4ceba;
+                --ink: #1a2610;
+                --ink-mid: #2e421e;
+                --green-deep: #2b4a28;
+                --green-rich: #3d6438;
+                --green-mid: #5a8050;
+                --green-sage: #7ea86e;
+                --green-pale: #b2cca4;
+                --green-wash: #d6e8cd;
+                --olive: #6b7a3a;
+                --teal: #3a6e6a;
+                --moss: #4a5e3a;
+                --gold: #7a6830;
+                --gold-pale: #c4aa68;
+                --border: rgba(43, 74, 40, 0.18);
+                --border-mid: rgba(43, 74, 40, 0.28);
+                --shadow: rgba(26, 38, 16, 0.14);
+            }
+
+            /* ── Base ──────────────────────────────── */
+            html {
+                font-size: 16px;
+                scroll-behavior: smooth;
+            }
+            body {
+                background-color: var(--paper);
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+                color: var(--ink);
+                font-family: "Noto Serif SC", Georgia, serif;
+                min-height: 100vh;
+                -webkit-font-smoothing: antialiased;
+            }
+            button {
+                cursor: pointer;
+                font-family: inherit;
+                border: none;
+                background: none;
+            }
+
+            /* ── Utility ───────────────────────────── */
+            .hidden {
+                display: none !important;
+            }
+            .fraunces {
+                font-family: "Fraunces", Georgia, serif;
+            }
+            .mono {
+                font-family: "Courier Prime", monospace;
+            }
+            .eyebrow {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.65rem;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: var(--green-sage);
+            }
+
+            /* ── Page ──────────────────────────────── */
+            .page {
+                max-width: 1160px;
+                margin: 0 auto;
+                padding: 0 28px;
+            }
+
+            /* ════════════════════════════════════════
+       HEADER
+    ════════════════════════════════════════ */
+            header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 22px 0 18px;
+                border-bottom: 1px solid var(--border-mid);
+                gap: 16px;
+            }
+
+            .brand {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
+
+            .brand-icon {
+                width: 38px;
+                height: 38px;
+                color: var(--green-rich);
+                flex-shrink: 0;
+            }
+
+            .brand-name {
+                font-family: "Fraunces", serif;
+                font-size: 1.55rem;
+                font-weight: 400;
+                letter-spacing: 0.04em;
+                color: var(--ink);
+                line-height: 1;
+            }
+
+            .brand-sub {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.65rem;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--green-sage);
+                margin-top: 3px;
+            }
+
+            .status {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 6px 16px;
+                border: 1px solid var(--border-mid);
+                font-family: "Courier Prime", monospace;
+                font-size: 0.68rem;
+                color: var(--green-mid);
+                letter-spacing: 0.08em;
+                background: rgba(90, 128, 80, 0.06);
+            }
+            .status-dot {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+            .dot-ok {
+                background: var(--green-sage);
+                box-shadow: 0 0 6px var(--green-sage);
+            }
+            .dot-err {
+                background: #b85c3a;
+                box-shadow: 0 0 6px #b85c3a;
+            }
+            .dot-pulse {
+                background: var(--gold-pale);
+                animation: blink 1.3s ease-in-out infinite;
+            }
+            @keyframes blink {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.2;
+                }
+            }
+
+            /* ════════════════════════════════════════
+       HERO
+    ════════════════════════════════════════ */
+            .hero {
+                position: relative;
+                overflow: hidden;
+                background: var(--green-deep);
+            }
+
+            .hero-inner {
+                max-width: 1160px;
+                margin: 0 auto;
+                padding: 64px 28px 56px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 40px;
+                align-items: center;
+                position: relative;
+                z-index: 1;
+            }
+
+            /* Decorative shapes */
+            .hero::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='500' height='500'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='500' height='500' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+                pointer-events: none;
+            }
+
+            .hero-shapes {
+                position: absolute;
+                inset: 0;
+                pointer-events: none;
+                overflow: hidden;
+            }
+
+            .hero-shapes span {
+                position: absolute;
+                border-radius: 50%;
+                opacity: 0.08;
+                background: var(--green-pale);
+            }
+            .hs1 {
+                width: 320px;
+                height: 320px;
+                top: -80px;
+                right: -60px;
+            }
+            .hs2 {
+                width: 180px;
+                height: 180px;
+                bottom: -40px;
+                left: 30%;
+                opacity: 0.05 !important;
+            }
+            .hs3 {
+                width: 80px;
+                height: 80px;
+                top: 40px;
+                left: 20%;
+                opacity: 0.06 !important;
+            }
+
+            .hero-left {
+                position: relative;
+                z-index: 1;
+            }
+
+            .hero-tag {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                font-family: "Courier Prime", monospace;
+                font-size: 0.68rem;
+                letter-spacing: 0.16em;
+                text-transform: uppercase;
+                color: var(--green-pale);
+                opacity: 0.7;
+                margin-bottom: 20px;
+            }
+
+            .hero-tag::before {
+                content: "";
+                display: inline-block;
+                width: 24px;
+                height: 1px;
+                background: var(--green-pale);
+                opacity: 0.5;
+            }
+
+            .hero-headline {
+                font-family: "Fraunces", serif;
+                font-size: clamp(2.2rem, 4vw, 3.2rem);
+                font-weight: 400;
+                font-style: italic;
+                line-height: 1.15;
+                color: var(--paper);
+                margin-bottom: 18px;
+            }
+
+            .hero-headline em {
+                font-style: normal;
+                color: var(--green-pale);
+            }
+
+            .hero-desc {
+                font-size: 1rem;
+                line-height: 1.75;
+                color: rgba(234, 228, 211, 0.65);
+                max-width: 400px;
+            }
+
+            /* Hero right: image collage */
+            .hero-right {
+                position: relative;
+                z-index: 1;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto;
+                gap: 10px;
+                align-items: start;
+            }
+
+            .hero-img {
+                border-radius: 2px;
+                overflow: hidden;
+                background: var(--green-rich);
+            }
+
+            .hero-img img {
+                width: 100%;
+                object-fit: cover;
+                filter: sepia(20%) saturate(75%) brightness(0.88);
+                display: block;
+            }
+
+            .hero-img-1 {
+                grid-column: 1;
+                height: 160px;
+            }
+            .hero-img-2 {
+                grid-column: 2;
+                height: 200px;
+                margin-top: -30px;
+            }
+            .hero-img-3 {
+                grid-column: 1 / 3;
+                height: 100px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: rgba(90, 128, 80, 0.25);
+                border: 1px solid rgba(178, 204, 164, 0.15);
+            }
+
+            .hero-img-3-text {
+                font-family: "Fraunces", serif;
+                font-size: 1.1rem;
+                font-style: italic;
+                color: var(--green-pale);
+                text-align: center;
+                opacity: 0.8;
+                letter-spacing: 0.05em;
+            }
+
+            @media (max-width: 760px) {
+                .hero-inner {
+                    grid-template-columns: 1fr;
+                }
+                .hero-right {
+                    display: none;
+                }
+            }
+
+            /* ════════════════════════════════════════
+       STATS BAR
+    ════════════════════════════════════════ */
+            .stats-bar {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .stat-block {
+                padding: 22px 24px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .stat-block:nth-child(1) {
+                background: var(--green-rich);
+            }
+            .stat-block:nth-child(2) {
+                background: var(--moss);
+            }
+            .stat-block:nth-child(3) {
+                background: var(--teal);
+            }
+            .stat-block:nth-child(4) {
+                background: var(--olive);
+            }
+
+            .stat-num {
+                font-family: "Fraunces", serif;
+                font-size: 2rem;
+                font-weight: 400;
+                color: var(--paper);
+                line-height: 1;
+            }
+
+            .stat-label {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.65rem;
+                letter-spacing: 0.13em;
+                text-transform: uppercase;
+                color: rgba(234, 228, 211, 0.6);
+            }
+
+            @media (max-width: 600px) {
+                .stats-bar {
+                    grid-template-columns: 1fr 1fr;
+                }
+            }
+
+            /* ════════════════════════════════════════
+       CAROUSEL
+    ════════════════════════════════════════ */
+            .carousel-section {
+                padding: 40px 0 0;
+                overflow: hidden;
+            }
+
+            .section-header {
+                display: flex;
+                align-items: baseline;
+                gap: 14px;
+                margin-bottom: 22px;
+            }
+
+            .section-title {
+                font-family: "Fraunces", serif;
+                font-size: 1.3rem;
+                font-weight: 400;
+                font-style: italic;
+                color: var(--ink-mid);
+            }
+
+            .carousel-track-wrap {
+                overflow: hidden;
+                padding-bottom: 32px;
+                -webkit-mask-image: linear-gradient(
+                    to right,
+                    transparent 0,
+                    black 60px,
+                    black calc(100% - 60px),
+                    transparent 100%
+                );
+                mask-image: linear-gradient(
+                    to right,
+                    transparent 0,
+                    black 60px,
+                    black calc(100% - 60px),
+                    transparent 100%
+                );
+            }
+
+            .carousel-track {
+                display: flex;
+                gap: 16px;
+                width: max-content;
+                animation: scroll-left 60s linear infinite;
+            }
+            .carousel-track:hover {
+                animation-play-state: paused;
+            }
+
+            @keyframes scroll-left {
+                0% {
+                    transform: translateX(0);
+                }
+                100% {
+                    transform: translateX(-50%);
+                }
+            }
+
+            .cat-card {
+                width: 210px;
+                flex-shrink: 0;
+                border-radius: 2px;
+                overflow: hidden;
+                background: var(--paper-warm);
+                border: 1px solid var(--border);
+                box-shadow: 0 2px 8px var(--shadow);
+                transition:
+                    transform 0.2s,
+                    box-shadow 0.2s;
+            }
+            .cat-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 6px 20px var(--shadow);
+            }
+
+            .cat-card-img {
+                width: 100%;
+                height: 138px;
+                object-fit: cover;
+                filter: sepia(18%) saturate(82%);
+                transition: filter 0.3s;
+                background: var(--green-wash);
+            }
+            .cat-card:hover .cat-card-img {
+                filter: sepia(0%) saturate(100%);
+            }
+
+            .cat-card-accent {
+                height: 4px;
+            }
+
+            .cat-card-body {
+                padding: 12px 14px 14px;
+            }
+
+            .cat-card-name {
+                font-size: 1.05rem;
+                font-weight: 500;
+                color: var(--ink);
+                margin-bottom: 2px;
+            }
+
+            .cat-card-en {
+                font-family: "Fraunces", serif;
+                font-size: 0.82rem;
+                font-style: italic;
+                color: var(--green-mid);
+                margin-bottom: 10px;
+            }
+
+            .cat-card-meta {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 9px;
+                border-top: 1px solid var(--border);
+            }
+
+            .cat-card-count {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.68rem;
+                color: var(--ink-mid);
+            }
+            .cat-card-count strong {
+                font-size: 0.82rem;
+            }
+
+            .cat-card-auc {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.65rem;
+                padding: 2px 7px;
+                border-radius: 1px;
+                color: var(--paper);
+                letter-spacing: 0.04em;
+            }
+
+            /* ════════════════════════════════════════
+       DIVIDER / SECTION BREAK
+    ════════════════════════════════════════ */
+            .divider {
+                border: none;
+                border-top: 1px solid var(--border);
+                margin: 0;
+            }
+
+            /* ════════════════════════════════════════
+       MAIN GRID
+    ════════════════════════════════════════ */
+            .main-wrap {
+                padding: 40px 0 56px;
+            }
+
+            .main-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 28px;
+                align-items: start;
+            }
+            @media (max-width: 760px) {
+                .main-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .col {
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+            }
+
+            .col-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding-bottom: 14px;
+                border-bottom: 1px solid var(--border);
+                margin-bottom: 2px;
+            }
+
+            .col-num {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: var(--green-rich);
+                color: var(--paper);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-family: "Fraunces", serif;
+                font-size: 0.9rem;
+                font-style: italic;
+                flex-shrink: 0;
+            }
+
+            .col-title {
+                font-family: "Fraunces", serif;
+                font-size: 1.25rem;
+                font-weight: 400;
+                font-style: italic;
+                color: var(--ink-mid);
+            }
+
+            /* ════════════════════════════════════════
+       UPLOAD ZONE
+    ════════════════════════════════════════ */
+            .upload-zone {
+                border: 1px solid var(--border-mid);
+                padding: 54px 24px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 14px;
+                cursor: pointer;
+                background: rgba(255, 255, 255, 0.26);
+                transition:
+                    border-color 0.2s,
+                    background 0.2s,
+                    box-shadow 0.2s;
+                outline: none;
+                position: relative;
+            }
+
+            /* Corner accents */
+            .upload-zone::before,
+            .upload-zone::after {
+                content: "";
+                position: absolute;
+                width: 22px;
+                height: 22px;
+                border-color: var(--green-pale);
+                border-style: solid;
+            }
+            .upload-zone::before {
+                top: 9px;
+                left: 9px;
+                border-width: 1px 0 0 1px;
+            }
+            .upload-zone::after {
+                bottom: 9px;
+                right: 9px;
+                border-width: 0 1px 1px 0;
+            }
+
+            .upload-zone:hover,
+            .upload-zone.drag-over {
+                border-color: var(--green-mid);
+                background: rgba(90, 128, 80, 0.07);
+                box-shadow: 0 4px 24px var(--shadow);
+            }
+
+            .upload-icon {
+                width: 46px;
+                height: 46px;
+                color: var(--green-mid);
+                opacity: 0.65;
+            }
+
+            .upload-main {
+                font-family: "Fraunces", serif;
+                font-size: 1.2rem;
+                font-style: italic;
+                color: var(--ink-mid);
+                text-align: center;
+            }
+
+            .upload-sub {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.68rem;
+                letter-spacing: 0.12em;
+                color: var(--green-sage);
+                text-transform: uppercase;
+            }
+
+            /* Info card below upload */
+            .upload-info {
+                background: var(--green-deep);
+                padding: 18px 20px;
+                display: flex;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .upload-info-icon {
+                flex-shrink: 0;
+                color: var(--green-pale);
+                width: 20px;
+                height: 20px;
+                margin-top: 1px;
+            }
+
+            .upload-info-text {
+                font-size: 0.88rem;
+                line-height: 1.65;
+                color: rgba(234, 228, 211, 0.75);
+            }
+
+            .upload-info-text strong {
+                color: var(--green-pale);
+                font-weight: 500;
+            }
+
+            /* ════════════════════════════════════════
+       PREVIEW
+    ════════════════════════════════════════ */
+            .preview-wrap {
+                position: relative;
+                border: 1px solid var(--border-mid);
+                overflow: hidden;
+                background: var(--paper-mid);
+            }
+
+            .preview-img {
+                width: 100%;
+                aspect-ratio: 1/1;
+                object-fit: contain;
+                filter: sepia(6%) contrast(97%);
+                display: block;
+            }
+
+            .reset-btn {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: rgba(234, 228, 211, 0.9);
+                color: var(--ink-mid);
+                border: 1px solid var(--border-mid);
+                padding: 5px 14px;
+                font-family: "Courier Prime", monospace;
+                font-size: 0.7rem;
+                letter-spacing: 0.08em;
+                backdrop-filter: blur(4px);
+                transition: background 0.15s;
+            }
+            .reset-btn:hover {
+                background: #eae4d3;
+            }
+
+            /* ════════════════════════════════════════
+       SPINNER
+    ════════════════════════════════════════ */
+            .spinner-wrap {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 18px;
+                padding: 72px 24px;
+                border: 1px solid var(--border);
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .spinner-ring {
+                width: 44px;
+                height: 44px;
+                border: 1.5px solid var(--green-wash);
+                border-top-color: var(--green-mid);
+                border-radius: 50%;
+                animation: spin 0.9s linear infinite;
+            }
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .spinner-text {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.72rem;
+                letter-spacing: 0.16em;
+                text-transform: uppercase;
+                color: var(--green-sage);
+            }
+
+            /* ════════════════════════════════════════
+       ERROR
+    ════════════════════════════════════════ */
+            .error-box {
+                display: flex;
+                align-items: flex-start;
+                gap: 14px;
+                padding: 20px;
+                border: 1px solid rgba(184, 92, 58, 0.28);
+                background: rgba(184, 92, 58, 0.05);
+            }
+            .error-icon {
+                flex-shrink: 0;
+                width: 18px;
+                height: 18px;
+                color: #b85c3a;
+                margin-top: 2px;
+            }
+            .error-title {
+                font-family: "Fraunces", serif;
+                font-size: 1rem;
+                color: #7a3820;
+                margin-bottom: 4px;
+            }
+            .error-msg {
+                font-size: 0.88rem;
+                color: var(--ink-mid);
+                line-height: 1.55;
+            }
+            .retry-btn {
+                margin-left: auto;
+                flex-shrink: 0;
+                align-self: center;
+                border: 1px solid #b85c3a;
+                color: #7a3820;
+                padding: 5px 14px;
+                font-family: "Courier Prime", monospace;
+                font-size: 0.7rem;
+                letter-spacing: 0.06em;
+                transition: background 0.15s;
+            }
+            .retry-btn:hover {
+                background: rgba(184, 92, 58, 0.08);
+            }
+
+            /* ════════════════════════════════════════
+       PLACEHOLDER
+    ════════════════════════════════════════ */
+            .placeholder {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 16px;
+                padding: 72px 28px;
+                border: 1px solid var(--border);
+                background: rgba(255, 255, 255, 0.18);
+                color: var(--green-sage);
+                text-align: center;
+            }
+            .placeholder-icon {
+                width: 42px;
+                height: 42px;
+                opacity: 0.4;
+            }
+            .placeholder p {
+                font-family: "Fraunces", serif;
+                font-style: italic;
+                font-size: 1.05rem;
+                line-height: 1.65;
+                max-width: 270px;
+                color: var(--ink-mid);
+                opacity: 0.7;
+            }
+
+            /* ════════════════════════════════════════
+       RESULT CARD
+    ════════════════════════════════════════ */
+            .result-card {
+                border: 1px solid var(--border-mid);
+                overflow: hidden;
+                background: rgba(255, 255, 255, 0.28);
+            }
+
+            /* Accent strip */
+            .res-accent {
+                height: 6px;
+            }
+
+            /* Top */
+            .res-top {
+                padding: 24px 24px 20px;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .res-eyebrow {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.65rem;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: var(--green-sage);
+                margin-bottom: 8px;
+            }
+
+            .res-class-name {
+                font-family: "Noto Serif SC", serif;
+                font-size: 2.4rem;
+                font-weight: 500;
+                color: var(--ink);
+                line-height: 1.1;
+                margin-bottom: 4px;
+            }
+
+            .res-class-en {
+                font-family: "Fraunces", serif;
+                font-size: 1rem;
+                font-style: italic;
+                color: var(--green-mid);
+                margin-bottom: 16px;
+            }
+
+            .res-conf-row {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .res-conf-pct {
+                font-family: "Fraunces", serif;
+                font-size: 1.6rem;
+                font-weight: 400;
+                color: var(--green-rich);
+                flex-shrink: 0;
+                min-width: 74px;
+            }
+
+            .conf-track {
+                flex: 1;
+                height: 3px;
+                background: var(--border-mid);
+                border-radius: 99px;
+                overflow: hidden;
+            }
+            .conf-fill {
+                height: 100%;
+                border-radius: 99px;
+                background: var(--green-rich);
+                transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            /* Tip */
+            .res-tip {
+                padding: 14px 24px;
+                border-bottom: 1px solid var(--border);
+                font-size: 0.9rem;
+                line-height: 1.65;
+                color: var(--ink-mid);
+                background: var(--green-wash);
+                display: flex;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            .tip-icon {
+                flex-shrink: 0;
+                width: 16px;
+                height: 16px;
+                color: var(--green-rich);
+                margin-top: 2px;
+            }
+
+            /* Similarity section */
+            .res-section {
+                padding: 20px 24px;
+                border-bottom: 1px solid var(--border);
+            }
+            .res-section-title {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.65rem;
+                letter-spacing: 0.18em;
+                text-transform: uppercase;
+                color: var(--green-sage);
+                margin-bottom: 16px;
+            }
+
+            .topk-list {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .topk-row {
+                display: grid;
+                grid-template-columns: 1fr 90px 58px;
+                align-items: center;
+                gap: 12px;
+            }
+            .topk-name-block {
+                display: flex;
+                flex-direction: column;
+                gap: 1px;
+            }
+            .topk-cn {
+                font-size: 0.95rem;
+                font-weight: 400;
+                color: var(--ink);
+            }
+            .topk-en {
+                font-family: "Fraunces", serif;
+                font-size: 0.75rem;
+                font-style: italic;
+                color: var(--green-mid);
+            }
+            .topk-bar-track {
+                height: 3px;
+                background: var(--border);
+                border-radius: 99px;
+                overflow: hidden;
+            }
+            .topk-bar-fill {
+                height: 100%;
+                border-radius: 99px;
+                transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            .rank-1 .topk-bar-fill {
+                background: var(--green-rich);
+            }
+            .rank-2 .topk-bar-fill {
+                background: var(--green-mid);
+            }
+            .rank-3 .topk-bar-fill {
+                background: var(--green-pale);
+            }
+            .topk-score {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.82rem;
+                color: var(--ink-mid);
+                text-align: right;
+            }
+
+            .similarity-note {
+                margin-top: 14px;
+                padding: 12px 14px;
+                background: rgba(90, 128, 80, 0.07);
+                border-left: 2px solid var(--green-pale);
+                font-size: 0.8rem;
+                font-style: italic;
+                line-height: 1.6;
+                color: var(--ink-mid);
+                opacity: 0.85;
+            }
+
+            /* Metrics */
+            .res-metrics {
+                padding: 20px 24px;
+                border-bottom: 1px solid var(--border);
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 18px;
+            }
+            .metric-item {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+            .metric-label {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.62rem;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--green-sage);
+            }
+            .metric-value {
+                font-family: "Fraunces", serif;
+                font-size: 1.3rem;
+                font-weight: 400;
+                color: var(--ink);
+            }
+
+            /* Meta footer of card */
+            .res-meta {
+                padding: 11px 24px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 14px;
+                font-family: "Courier Prime", monospace;
+                font-size: 0.65rem;
+                letter-spacing: 0.06em;
+                color: var(--green-sage);
+            }
+
+            /* ════════════════════════════════════════
+       BATCH RESULTS
+    ════════════════════════════════════════ */
+            .batch-section {
+                margin-top: 32px;
+                display: flex;
+                flex-direction: column;
+                gap: 28px;
+            }
+
+            .batch-section-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding-bottom: 14px;
+                border-bottom: 1px solid var(--border-mid);
+            }
+
+            .batch-count {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.72rem;
+                letter-spacing: 0.1em;
+                color: var(--green-sage);
+            }
+
+            .batch-reset-btn {
+                border: 1px solid var(--border-mid);
+                color: var(--ink-mid);
+                padding: 5px 14px;
+                font-family: "Courier Prime", monospace;
+                font-size: 0.68rem;
+                letter-spacing: 0.06em;
+                transition: background 0.15s;
+            }
+            .batch-reset-btn:hover {
+                background: rgba(43, 74, 40, 0.06);
+            }
+
+            /* Progress bar */
+            .batch-progress-wrap {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .batch-progress-label {
+                display: flex;
+                justify-content: space-between;
+                font-family: "Courier Prime", monospace;
+                font-size: 0.7rem;
+                color: var(--green-sage);
+            }
+            .batch-progress-track {
+                height: 3px;
+                background: var(--border);
+                border-radius: 99px;
+                overflow: hidden;
+            }
+            .batch-progress-fill {
+                height: 100%;
+                background: var(--green-rich);
+                border-radius: 99px;
+                transition: width 0.3s ease;
+            }
+
+            /* Image grid */
+            .batch-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 18px;
+            }
+
+            .batch-item {
+                border: 1px solid var(--border-mid);
+                background: rgba(255, 255, 255, 0.28);
+                overflow: hidden;
+            }
+
+            .batch-item-img-wrap {
+                position: relative;
+                height: 180px;
+                overflow: hidden;
+                background: var(--paper-mid);
+            }
+
+            .batch-item-img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                filter: sepia(6%) contrast(97%);
+            }
+
+            .batch-item-accent {
+                height: 4px;
+            }
+
+            .batch-item-filename {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.65rem;
+                letter-spacing: 0.04em;
+                color: var(--green-sage);
+                padding: 10px 14px 0;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .batch-item-class {
+                font-family: "Noto Serif SC", serif;
+                font-size: 1.3rem;
+                font-weight: 500;
+                padding: 4px 14px 2px;
+                color: var(--ink);
+            }
+
+            .batch-item-en {
+                font-family: "Fraunces", serif;
+                font-size: 0.82rem;
+                font-style: italic;
+                color: var(--green-mid);
+                padding: 0 14px 10px;
+            }
+
+            .batch-item-conf-row {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 0 14px 12px;
+            }
+
+            .batch-item-conf-pct {
+                font-family: "Fraunces", serif;
+                font-size: 1.1rem;
+                color: var(--green-rich);
+                flex-shrink: 0;
+                min-width: 54px;
+            }
+
+            .batch-item-topk {
+                padding: 10px 14px 14px;
+                display: flex;
+                flex-direction: column;
+                gap: 7px;
+                border-top: 1px solid var(--border);
+            }
+
+            .batch-item-topk-row {
+                display: grid;
+                grid-template-columns: 1fr 70px 42px;
+                align-items: center;
+                gap: 8px;
+                font-size: 0.78rem;
+            }
+
+            .batch-item-topk-name {
+                color: var(--ink);
+            }
+            .batch-item-topk-score {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.72rem;
+                color: var(--ink-mid);
+                text-align: right;
+            }
+
+            .batch-item-metrics {
+                padding: 10px 14px 12px;
+                border-top: 1px solid var(--border);
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .batch-metric {
+                display: flex;
+                flex-direction: column;
+                gap: 1px;
+            }
+            .batch-metric-label {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.58rem;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--green-sage);
+            }
+            .batch-metric-val {
+                font-family: "Fraunces", serif;
+                font-size: 0.95rem;
+                color: var(--ink);
+            }
+
+            .batch-item-error {
+                padding: 14px;
+                font-size: 0.82rem;
+                color: #7a3820;
+                font-style: italic;
+            }
+
+            /* Summary table */
+            .summary-wrap {
+                border: 1px solid var(--border-mid);
+                overflow: hidden;
+            }
+
+            .summary-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px 20px;
+                background: var(--green-deep);
+            }
+
+            .summary-title {
+                font-family: "Fraunces", serif;
+                font-size: 1rem;
+                font-style: italic;
+                color: var(--paper);
+            }
+
+            .summary-export-btn {
+                border: 1px solid rgba(234, 228, 211, 0.3);
+                color: rgba(234, 228, 211, 0.8);
+                padding: 4px 13px;
+                font-family: "Courier Prime", monospace;
+                font-size: 0.65rem;
+                letter-spacing: 0.08em;
+                transition: background 0.15s;
+            }
+            .summary-export-btn:hover {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .summary-table-wrap {
+                overflow-x: auto;
+            }
+
+            .summary-table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 0.82rem;
+            }
+
+            .summary-table th {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.62rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--green-sage);
+                padding: 10px 16px;
+                text-align: left;
+                border-bottom: 1px solid var(--border-mid);
+                background: rgba(43, 74, 40, 0.04);
+                white-space: nowrap;
+            }
+
+            .summary-table td {
+                padding: 10px 16px;
+                border-bottom: 1px solid var(--border);
+                vertical-align: middle;
+                color: var(--ink-mid);
+            }
+
+            .summary-table tr:last-child td {
+                border-bottom: none;
+            }
+            .summary-table tr:hover td {
+                background: rgba(43, 74, 40, 0.03);
+            }
+
+            .summary-table .td-thumb {
+                width: 44px;
+                height: 44px;
+                object-fit: cover;
+                border-radius: 1px;
+                filter: sepia(10%);
+            }
+
+            .summary-table .td-class {
+                font-family: "Noto Serif SC", serif;
+                font-weight: 500;
+                color: var(--ink);
+            }
+
+            .summary-table .td-conf {
+                font-family: "Fraunces", serif;
+                font-size: 0.95rem;
+                font-weight: 400;
+            }
+
+            .summary-table .td-mono {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.75rem;
+            }
+
+            .conf-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .conf-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+
+            /* ════════════════════════════════════════
+       CITY SELECTOR STRIP
+    ════════════════════════════════════════ */
+            .city-strip {
+                background: var(--green-deep);
+                border-bottom: 1px solid rgba(178, 204, 164, 0.15);
+                margin: 0 -28px;
+            }
+            .city-strip-inner {
+                max-width: 1160px;
+                margin: 0 auto;
+                padding: 10px 28px;
+                display: flex;
+                align-items: center;
+                gap: 14px;
+            }
+            .city-strip-label {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.68rem;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--green-pale);
+                opacity: 0.75;
+                flex-shrink: 0;
+            }
+            .city-select {
+                appearance: none;
+                -webkit-appearance: none;
+                background: rgba(255, 255, 255, 0.08)
+                    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B2CCA4' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")
+                    no-repeat right 12px center;
+                border: 1px solid rgba(178, 204, 164, 0.25);
+                color: var(--paper);
+                padding: 6px 36px 6px 14px;
+                font-family: "Noto Serif SC", serif;
+                font-size: 0.88rem;
+                cursor: pointer;
+                border-radius: 2px;
+                min-width: 160px;
+                transition: border-color 0.2s;
+            }
+            .city-select:focus {
+                outline: none;
+                border-color: var(--green-pale);
+            }
+            .city-select option {
+                background: var(--green-deep);
+                color: var(--paper);
+            }
+            .city-select optgroup {
+                color: var(--green-pale);
+                font-style: normal;
+            }
+
+            .city-strip-hint {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.65rem;
+                letter-spacing: 0.08em;
+                color: rgba(178, 204, 164, 0.5);
+                flex: 1;
+            }
+
+            /* ════════════════════════════════════════
+       CITY GUIDE PANEL
+    ════════════════════════════════════════ */
+            .city-guide {
+                border: 1px solid var(--border-mid);
+                background: rgba(255, 255, 255, 0.22);
+                overflow: hidden;
+            }
+
+            .city-guide-top {
+                padding: 16px 22px 14px;
+                border-bottom: 1px solid var(--border);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+            }
+
+            .city-guide-city-name {
+                font-family: "Fraunces", serif;
+                font-size: 1.05rem;
+                font-style: italic;
+                color: var(--ink-mid);
+            }
+
+            .city-guide-reg {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.62rem;
+                letter-spacing: 0.06em;
+                color: var(--green-sage);
+                text-align: right;
+                line-height: 1.5;
+            }
+
+            .city-guide-bin-row {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 16px 22px;
+                border-bottom: 1px solid var(--border);
+                background: rgba(43, 74, 40, 0.03);
+            }
+
+            .bin-circle {
+                width: 42px;
+                height: 42px;
+                border-radius: 50%;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .bin-circle svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .bin-category-name {
+                font-family: "Noto Serif SC", serif;
+                font-size: 1.2rem;
+                font-weight: 500;
+                color: var(--ink);
+            }
+
+            .bin-color-hint {
+                font-family: "Courier Prime", monospace;
+                font-size: 0.68rem;
+                letter-spacing: 0.06em;
+                color: var(--green-sage);
+                margin-top: 2px;
+            }
+
+            .city-guide-instruction {
+                padding: 14px 22px;
+                font-size: 0.9rem;
+                line-height: 1.75;
+                color: var(--ink-mid);
+                border-bottom: 1px solid var(--border);
+            }
+
+            .city-guide-notes {
+                padding: 12px 22px;
+                display: flex;
+                flex-direction: column;
+                gap: 7px;
+            }
+
+            .city-note-item {
+                display: flex;
+                gap: 8px;
+                font-size: 0.82rem;
+                line-height: 1.55;
+                color: var(--ink-mid);
+                font-style: italic;
+            }
+
+            .city-note-dot {
+                width: 4px;
+                height: 4px;
+                background: var(--green-sage);
+                border-radius: 50%;
+                flex-shrink: 0;
+                margin-top: 7px;
+            }
+
+            /* Bin colors */
+            .bin-blue {
+                background: #2a5f8a;
+            }
+            .bin-green {
+                background: #3d6438;
+            }
+            .bin-red {
+                background: #b85c3a;
+            }
+            .bin-brown {
+                background: #7a4520;
+            }
+            .bin-black {
+                background: #2a2a2a;
+            }
+            .bin-gray {
+                background: #5a5a5a;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="page">
+            <!-- ══ HEADER ══════════════════════════════ -->
+            <header>
+                <div class="brand">
+                    <svg
+                        class="brand-icon"
+                        viewBox="0 0 38 38"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path
+                            d="M19 5 C19 5, 7 9, 7 21 C7 29, 13 33, 19 33 C25 33, 31 29, 31 21 C31 9, 19 5, 19 5Z"
+                        />
+                        <path d="M19 33 L19 15" />
+                        <path d="M19 21 C19 21, 13 17, 11 13" />
+                        <path d="M19 25 C19 25, 25 21, 27 17" />
+                    </svg>
+                    <div>
+                        <div class="brand-name">垃圾分类识别</div>
+                        <div class="brand-sub">
+                            Garbage Classification · AI Vision
+                        </div>
+                    </div>
+                </div>
+                <div class="status">
+                    <span class="status-dot dot-pulse" id="status-dot"></span>
+                    <span id="status-text">connecting</span>
+                </div>
+            </header>
+        </div>
+
+        <!-- ══ CITY STRIP ════════════════════════════ -->
+        <div class="city-strip">
+            <div class="city-strip-inner">
+                <label class="city-strip-label" for="city-select"
+                    >所在城市</label
+                >
+                <select class="city-select" id="city-select">
+                    <option value="">选择城市以查看当地规范</option>
+                    <optgroup label="──── 华北 ────">
+                        <option value="北京">北京</option>
+                        <option value="天津">天津</option>
+                        <option value="石家庄">石家庄</option>
+                        <option value="太原">太原</option>
+                        <option value="呼和浩特">呼和浩特</option>
+                    </optgroup>
+                    <optgroup label="──── 东北 ────">
+                        <option value="哈尔滨">哈尔滨</option>
+                        <option value="沈阳">沈阳</option>
+                        <option value="大连">大连</option>
+                        <option value="长春">长春</option>
+                    </optgroup>
+                    <optgroup label="──── 华东 ────">
+                        <option value="上海">上海</option>
+                        <option value="南京">南京</option>
+                        <option value="杭州">杭州</option>
+                        <option value="宁波">宁波</option>
+                        <option value="无锡">无锡</option>
+                        <option value="苏州">苏州</option>
+                        <option value="合肥">合肥</option>
+                        <option value="福州">福州</option>
+                        <option value="厦门">厦门</option>
+                        <option value="青岛">青岛</option>
+                        <option value="济南">济南</option>
+                        <option value="南昌">南昌</option>
+                    </optgroup>
+                    <optgroup label="──── 华中 ────">
+                        <option value="武汉">武汉</option>
+                        <option value="长沙">长沙</option>
+                        <option value="郑州">郑州</option>
+                    </optgroup>
+                    <optgroup label="──── 华南 ────">
+                        <option value="广州">广州</option>
+                        <option value="深圳">深圳</option>
+                        <option value="南宁">南宁</option>
+                        <option value="海口">海口</option>
+                    </optgroup>
+                    <optgroup label="──── 西南 ────">
+                        <option value="成都">成都</option>
+                        <option value="重庆">重庆</option>
+                        <option value="贵阳">贵阳</option>
+                        <option value="昆明">昆明</option>
+                        <option value="拉萨">拉萨</option>
+                    </optgroup>
+                    <optgroup label="──── 西北 ────">
+                        <option value="西安">西安</option>
+                        <option value="兰州">兰州</option>
+                        <option value="乌鲁木齐">乌鲁木齐</option>
+                        <option value="银川">银川</option>
+                        <option value="西宁">西宁</option>
+                    </optgroup>
+                </select>
+                <span class="city-strip-hint"
+                    >选择后识别结果将显示当地垃圾分类规范</span
+                >
+            </div>
+        </div>
+
+        <!-- ══ HERO ═════════════════════════════════ -->
+        <div class="hero">
+            <div class="hero-shapes">
+                <span class="hs1"></span>
+                <span class="hs2"></span>
+                <span class="hs3"></span>
+            </div>
+            <div class="hero-inner">
+                <div class="hero-left">
+                    <h1 class="hero-headline">
+                        让每一片<em>废弃</em><br />
+                        重新找到归处
+                    </h1>
+                    <p class="hero-desc">
+                        通过深度学习模型，自动识别十种常见垃圾类型，
+                        为精准分类提供实时智能支持，推动可持续资源循环。
+                    </p>
+                </div>
+                <div class="hero-right">
+                    <div class="hero-img hero-img-1">
+                        <img
+                            src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=400&h=320&fit=crop&q=75"
+                            alt="自然"
+                        />
+                    </div>
+                    <div class="hero-img hero-img-2">
+                        <img
+                            src="https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=400&h=400&fit=crop&q=75"
+                            alt="绿叶"
+                        />
+                    </div>
+                    <div class="hero-img hero-img-3">
+                        <p class="hero-img-3-text">识别 · 分类 · 守护地球</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ STATS ════════════════════════════════ -->
+        <div class="stats-bar">
+            <div class="stat-block">
+                <span class="stat-num fraunces">10</span>
+                <span class="stat-label">垃圾类别</span>
+            </div>
+            <div class="stat-block">
+                <span class="stat-num fraunces">92.4%</span>
+                <span class="stat-label">测试准确率</span>
+            </div>
+            <div class="stat-block">
+                <span class="stat-num fraunces">0.989</span>
+                <span class="stat-label">ROC AUC</span>
+            </div>
+            <div class="stat-block">
+                <span class="stat-num fraunces">917</span>
+                <span class="stat-label">测试集样本数</span>
+            </div>
+        </div>
+
+        <div class="page">
+            <!-- ══ CAROUSEL ═════════════════════════════ -->
+            <section class="carousel-section">
+                <div class="section-header">
+                    <span class="eyebrow">数据集类别</span>
+                    <span class="section-title"
+                        >— 十种垃圾类型，涵盖日常废弃物</span
+                    >
+                </div>
+                <div class="carousel-track-wrap">
+                    <div class="carousel-track" id="carousel-track"></div>
+                </div>
+            </section>
+
+            <hr class="divider" />
+
+            <!-- ══ MAIN ═════════════════════════════════ -->
+            <div class="main-wrap">
+                <div class="main-grid">
+                    <!-- Left: upload -->
+                    <div class="col">
+                        <div class="col-header">
+                            <div class="col-num">1</div>
+                            <span class="col-title">上传图像</span>
+                        </div>
+
+                        <div
+                            class="upload-zone"
+                            id="upload-zone"
+                            tabindex="0"
+                            role="button"
+                            aria-label="点击或拖拽上传图片"
+                        >
+                            <input
+                                type="file"
+                                id="file-input"
+                                accept="image/jpeg,image/png,image/webp"
+                                multiple
+                                style="display: none"
+                            />
+                            <svg
+                                class="upload-icon"
+                                viewBox="0 0 46 46"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <rect
+                                    x="7"
+                                    y="7"
+                                    width="32"
+                                    height="32"
+                                    rx="1"
+                                />
+                                <path d="M23 30 L23 17" />
+                                <path d="M17 23 L23 17 L29 23" />
+                                <path d="M15 36 L31 36" />
+                            </svg>
+                            <p class="upload-main">拖拽图片至此，或点击选取</p>
+                            <span class="upload-sub"
+                                >支持批量上传 · JPG · PNG · WebP · 单张最大 10
+                                MB</span
+                            >
+                        </div>
+
+                        <div class="upload-info">
+                            <svg
+                                class="upload-info-icon"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.3"
+                                stroke-linecap="round"
+                            >
+                                <circle cx="10" cy="10" r="8" />
+                                <path d="M10 9 L10 14" />
+                                <circle
+                                    cx="10"
+                                    cy="6.5"
+                                    r=".6"
+                                    fill="currentColor"
+                                    stroke="none"
+                                />
+                            </svg>
+                            <p class="upload-info-text">
+                                支持<strong>单张或批量上传</strong>，批量识别后以图卡形式展示每张结果，并生成汇总报告。
+                                模型基于
+                                <strong>ConvNeXt Tiny</strong>
+                                架构，识别十类常见垃圾。
+                            </p>
+                        </div>
+
+                        <div class="preview-wrap hidden" id="preview-wrap">
+                            <img
+                                id="preview-img"
+                                alt="预览图像"
+                                class="preview-img"
+                            />
+                            <button class="reset-btn" id="reset-btn">
+                                重新上传
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: single result -->
+                    <div class="col" id="single-col">
+                        <div class="col-header">
+                            <div class="col-num">2</div>
+                            <span class="col-title">识别结果</span>
+                        </div>
+
+                        <div class="placeholder" id="placeholder">
+                            <svg
+                                class="placeholder-icon"
+                                viewBox="0 0 42 42"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.2"
+                                stroke-linecap="round"
+                            >
+                                <circle cx="21" cy="21" r="15" />
+                                <path d="M21 14 L21 21" />
+                                <circle
+                                    cx="21"
+                                    cy="27"
+                                    r=".8"
+                                    fill="currentColor"
+                                    stroke="none"
+                                />
+                            </svg>
+                            <p>
+                                上传图片后，AI
+                                将即时识别类别并显示完整分析。支持批量上传多张。
+                            </p>
+                        </div>
+
+                        <div class="spinner-wrap hidden" id="spinner">
+                            <div class="spinner-ring"></div>
+                            <span class="spinner-text"
+                                >模型推理中 · inference</span
+                            >
+                        </div>
+
+                        <div class="error-box hidden" id="error-box">
+                            <svg
+                                class="error-icon"
+                                viewBox="0 0 18 18"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.3"
+                                stroke-linecap="round"
+                            >
+                                <circle cx="9" cy="9" r="7.5" />
+                                <path d="M9 6 L9 10" />
+                                <circle
+                                    cx="9"
+                                    cy="13"
+                                    r=".6"
+                                    fill="currentColor"
+                                    stroke="none"
+                                />
+                            </svg>
+                            <div>
+                                <p class="error-title">识别失败</p>
+                                <p class="error-msg" id="error-msg"></p>
+                            </div>
+                            <button class="retry-btn" id="retry-btn">
+                                重试
+                            </button>
+                        </div>
+
+                        <div class="result-card hidden" id="result-card">
+                            <div class="res-accent" id="res-accent"></div>
+                            <div class="res-top">
+                                <p class="res-eyebrow">识别类别</p>
+                                <p class="res-class-name" id="res-name"></p>
+                                <p class="res-class-en" id="res-key"></p>
+                                <div class="res-conf-row">
+                                    <span
+                                        class="res-conf-pct"
+                                        id="res-pct"
+                                    ></span>
+                                    <div class="conf-track">
+                                        <div
+                                            class="conf-fill"
+                                            id="res-bar"
+                                        ></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="res-tip" id="res-tip">
+                                <svg
+                                    class="tip-icon"
+                                    viewBox="0 0 16 16"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.3"
+                                    stroke-linecap="round"
+                                >
+                                    <path
+                                        d="M8 2 C8 2,3 4,3 9 C3 12.5,5.5 14,8 14 C10.5 14,13 12.5,13 9 C13 4,8 2,8 2Z"
+                                    />
+                                    <path d="M8 14 L8 8" />
+                                </svg>
+                                <span id="res-tip-text"></span>
+                            </div>
+                            <div class="res-section">
+                                <p class="res-section-title">
+                                    视觉相似度排序 · Top 3
+                                </p>
+                                <div class="topk-list" id="topk-list"></div>
+                                <div class="similarity-note">
+                                    模型以 Softmax
+                                    概率衡量各类别相似度——数值越高，说明图像在视觉特征空间中与该类越接近。
+                                </div>
+                            </div>
+                            <div class="res-section" id="res-metrics-section">
+                                <p class="res-section-title">
+                                    此类别测试集指标
+                                </p>
+                                <div class="res-metrics">
+                                    <div class="metric-item">
+                                        <span class="metric-label"
+                                            >Precision 精确率</span
+                                        ><span
+                                            class="metric-value"
+                                            id="m-precision"
+                                            >—</span
+                                        >
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label"
+                                            >Recall 召回率</span
+                                        ><span
+                                            class="metric-value"
+                                            id="m-recall"
+                                            >—</span
+                                        >
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label"
+                                            >F1-Score</span
+                                        ><span class="metric-value" id="m-f1"
+                                            >—</span
+                                        >
+                                    </div>
+                                    <div class="metric-item">
+                                        <span class="metric-label">ROC AUC</span
+                                        ><span class="metric-value" id="m-auc"
+                                            >—</span
+                                        >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="res-meta" id="res-meta"></div>
+                        </div>
+
+                        <!-- City guide (shown after result when city selected) -->
+                        <div class="city-guide hidden" id="city-guide">
+                            <div class="city-guide-top">
+                                <span
+                                    class="city-guide-city-name"
+                                    id="cg-city-name"
+                                ></span>
+                                <div class="city-guide-reg" id="cg-reg"></div>
+                            </div>
+                            <div class="city-guide-bin-row">
+                                <div class="bin-circle" id="cg-bin-circle">
+                                    <svg
+                                        viewBox="0 0 20 20"
+                                        fill="none"
+                                        stroke="white"
+                                        stroke-width="1.3"
+                                        stroke-linecap="round"
+                                    >
+                                        <path
+                                            d="M4 6h12M8 6V4h4v2M6 6l1 10h6l1-10"
+                                        />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div
+                                        class="bin-category-name"
+                                        id="cg-category"
+                                    ></div>
+                                    <div
+                                        class="bin-color-hint"
+                                        id="cg-bin-hint"
+                                    ></div>
+                                </div>
+                            </div>
+                            <div
+                                class="city-guide-instruction"
+                                id="cg-instruction"
+                            ></div>
+                            <div class="city-guide-notes" id="cg-notes"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- .main-grid -->
+
+                <!-- Batch results (full-width, shown when multiple files) -->
+                <div class="batch-section hidden" id="batch-section">
+                    <div class="batch-section-header">
+                        <div>
+                            <div
+                                class="col-header"
+                                style="border: none; padding: 0; margin: 0"
+                            >
+                                <div class="col-num">2</div>
+                                <span class="col-title">批量识别结果</span>
+                            </div>
+                            <p
+                                class="batch-count"
+                                id="batch-count"
+                                style="margin-top: 6px"
+                            ></p>
+                        </div>
+                        <button class="batch-reset-btn" id="batch-reset-btn">
+                            重新上传
+                        </button>
+                    </div>
+
+                    <!-- Progress (during processing) -->
+                    <div
+                        class="batch-progress-wrap hidden"
+                        id="batch-progress-wrap"
+                    >
+                        <div class="batch-progress-label">
+                            <span>正在识别…</span>
+                            <span id="batch-progress-text">0 / 0</span>
+                        </div>
+                        <div class="batch-progress-track">
+                            <div
+                                class="batch-progress-fill"
+                                id="batch-progress-fill"
+                                style="width: 0%"
+                            ></div>
+                        </div>
+                    </div>
+
+                    <!-- Image cards grid -->
+                    <div class="batch-grid" id="batch-grid"></div>
+
+                    <!-- Summary table -->
+                    <div class="summary-wrap hidden" id="summary-wrap">
+                        <div class="summary-header">
+                            <span class="summary-title">— 识别汇总报告</span>
+                            <button class="summary-export-btn" id="export-btn">
+                                导出 CSV
+                            </button>
+                        </div>
+                        <div class="summary-table-wrap">
+                            <table class="summary-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>图片</th>
+                                        <th>文件名</th>
+                                        <th>识别类别</th>
+                                        <th>英文</th>
+                                        <th>信心度</th>
+                                        <th id="city-col-header">当地分类</th>
+                                        <th>回收说明</th>
+                                        <th>Precision</th>
+                                        <th>Recall</th>
+                                        <th>F1</th>
+                                        <th>ROC AUC</th>
+                                        <th>处理时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="summary-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- .main-wrap -->
+        </div>
+        <!-- .page -->
+
+        <script>
+            // ── Config ─────────────────────────────────
+            const API =
+                window.API_BASE ??
+                "https://gawon1189-garbage-classification-system.hf.space";
+
+            // ── Category data ──────────────────────────
+            const CATS = {
+                battery: {
+                    zh: "电池",
+                    en: "Battery",
+                    img: "photo-1612965110642-d2ed35011901",
+                    color: "#6B7A3A",
+                    support: 54,
+                    auc: 0.9997,
+                    tip: "属有害废弃物，请勿混入一般垃圾，送至指定电池回收点。",
+                },
+                biological: {
+                    zh: "生物废弃物",
+                    en: "Biological",
+                    img: "photo-1542601906990-b4d3fb778b09",
+                    color: "#3D6438",
+                    support: 51,
+                    auc: 0.9968,
+                    tip: "厨余、果皮等有机废弃物，可堆肥或送厨余桶处理。",
+                },
+                cardboard: {
+                    zh: "纸板",
+                    en: "Cardboard",
+                    img: "photo-1656543802898-41c8c46683a7",
+                    color: "#5A8050",
+                    support: 113,
+                    auc: 0.9751,
+                    tip: "压扁后捆绑，放入纸类资源回收桶，避免沾湿。",
+                },
+                clothes: {
+                    zh: "衣物",
+                    en: "Clothes",
+                    img: "photo-1604176354204-9268737828e4",
+                    color: "#3A6E6A",
+                    support: 85,
+                    auc: 1.0,
+                    tip: "可捐赠至二手衣物回收机构，或送至旧衣回收箱。",
+                },
+                glass: {
+                    zh: "玻璃",
+                    en: "Glass",
+                    img: "photo-1608745167260-e15bc0e0521f",
+                    color: "#3A6E55",
+                    support: 116,
+                    auc: 0.9951,
+                    tip: "清洗晾干后，分色放入玻璃容器回收桶，注意防碎伤。",
+                },
+                metal: {
+                    zh: "金属",
+                    en: "Metal",
+                    img: "photo-1699464884530-de6a7f9b1301",
+                    color: "#4A5E3A",
+                    support: 110,
+                    auc: 0.997,
+                    tip: "清洗后压扁，放入铁铝罐资源回收桶。",
+                },
+                paper: {
+                    zh: "纸类",
+                    en: "Paper",
+                    img: "photo-1504711434969-e33886168f5c",
+                    color: "#7A9E52",
+                    support: 112,
+                    auc: 0.9875,
+                    tip: "保持干燥，放入纸类回收桶；沾油污的纸张需另行处理。",
+                },
+                plastic: {
+                    zh: "塑料",
+                    en: "Plastic",
+                    img: "photo-1621451537084-482c73073a0f",
+                    color: "#5A8050",
+                    support: 113,
+                    auc: 0.98,
+                    tip: "确认回收编号，清洗后放入塑料容器回收桶。",
+                },
+                shoes: {
+                    zh: "鞋子",
+                    en: "Shoes",
+                    img: "photo-1539185441755-769473a23570",
+                    color: "#3D6460",
+                    support: 85,
+                    auc: 1.0,
+                    tip: "可捐赠或送至旧鞋回收点，成对捆好交付。",
+                },
+                trash: {
+                    zh: "一般垃圾",
+                    en: "Trash",
+                    img: "photo-1611830696076-462acd8aa9e9",
+                    color: "#6B7A5A",
+                    support: 78,
+                    auc: 0.9654,
+                    tip: "无法资源化的废弃物，依规定放入专用垃圾袋。",
+                },
+            };
+
+            const METRICS = {
+                battery: { precision: 0.963, recall: 0.963, f1: 0.963 },
+                biological: { precision: 0.98, recall: 0.941, f1: 0.96 },
+                cardboard: { precision: 0.879, recall: 0.903, f1: 0.891 },
+                clothes: { precision: 1.0, recall: 1.0, f1: 1.0 },
+                glass: { precision: 0.955, recall: 0.922, f1: 0.939 },
+                metal: { precision: 0.891, recall: 0.964, f1: 0.926 },
+                paper: { precision: 0.866, recall: 0.92, f1: 0.892 },
+                plastic: { precision: 0.87, recall: 0.832, f1: 0.851 },
+                shoes: { precision: 1.0, recall: 1.0, f1: 1.0 },
+                trash: { precision: 0.929, recall: 0.833, f1: 0.878 },
+            };
+
+            function imgUrl(id) {
+                return `https://images.unsplash.com/${id}?w=420&h=280&fit=crop&q=75`;
+            }
+
+            // ── Carousel ────────────────────────────────
+            function buildCarousel() {
+                const track = document.getElementById("carousel-track");
+                const entries = Object.entries(CATS);
+                [...entries, ...entries].forEach(([key, cfg]) => {
+                    const card = document.createElement("div");
+                    card.className = "cat-card";
+                    card.innerHTML = `
+      <img class="cat-card-img" src="${imgUrl(cfg.img)}" alt="${cfg.zh}"
+           onerror="this.style.background='#B2CCA4'"/>
+      <div class="cat-card-accent" style="background:${cfg.color}"></div>
+      <div class="cat-card-body">
+        <p class="cat-card-name">${cfg.zh}</p>
+        <p class="cat-card-en">${cfg.en}</p>
+        <div class="cat-card-meta">
+          <span class="cat-card-count">测试集 <strong>${cfg.support}</strong> 张</span>
+          <span class="cat-card-auc" style="background:${cfg.color}">AUC ${cfg.auc.toFixed(3)}</span>
+        </div>
+      </div>
+    `;
+                    track.appendChild(card);
+                });
+            }
+            buildCarousel();
+
+            // ── Health check ────────────────────────────
+            const dot = document.getElementById("status-dot");
+            const stxt = document.getElementById("status-text");
+
+            function setStatus(s) {
+                dot.className = "status-dot";
+                if (s === "ok") {
+                    dot.classList.add("dot-ok");
+                    stxt.textContent = "model ready";
+                } else if (s === "err") {
+                    dot.classList.add("dot-err");
+                    stxt.textContent = "model error";
+                } else if (s === "off") {
+                    dot.classList.add("dot-err");
+                    stxt.textContent = "offline";
+                } else {
+                    dot.classList.add("dot-pulse");
+                    stxt.textContent = "connecting";
+                }
+            }
+
+            async function checkHealth() {
+                try {
+                    const r = await fetch(`${API}/health`);
+                    if (!r.ok) {
+                        setStatus("err");
+                        return;
+                    }
+                    const d = await r.json();
+                    setStatus(d.model?.ready ? "ok" : "err");
+                } catch {
+                    setStatus("off");
+                }
+            }
+            checkHealth();
+            setInterval(checkHealth, 30_000);
+
+            // ── DOM ─────────────────────────────────────
+            const $ = (id) => document.getElementById(id);
+            const uploadZone = $("upload-zone");
+            const fileInput = $("file-input");
+            const previewWrap = $("preview-wrap");
+            const placeholder = $("placeholder");
+            const spinner = $("spinner");
+            const errorBox = $("error-box");
+            const resultCard = $("result-card");
+            const singleCol = $("single-col");
+            const batchSection = $("batch-section");
+            let objectUrl = null;
+            let _batchResults = []; // for CSV export
+
+            // ── Single result helpers ───────────────────
+            function showOnly(...els) {
+                [placeholder, spinner, errorBox, resultCard].forEach((e) =>
+                    e.classList.toggle("hidden", !els.includes(e)),
+                );
+            }
+
+            function resetUI() {
+                if (objectUrl) {
+                    URL.revokeObjectURL(objectUrl);
+                    objectUrl = null;
+                }
+                uploadZone.classList.remove("hidden");
+                previewWrap.classList.add("hidden");
+                singleCol.classList.remove("hidden");
+                batchSection.classList.add("hidden");
+                $("batch-grid").innerHTML = "";
+                $("summary-tbody").innerHTML = "";
+                $("summary-wrap").classList.add("hidden");
+                $("batch-progress-wrap").classList.add("hidden");
+                $("city-guide").classList.add("hidden");
+                showOnly(placeholder);
+                _batchResults = [];
+            }
+
+            // ── File validation ─────────────────────────
+            const ACCEPTED = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+            function validateFile(file) {
+                if (!ACCEPTED.has(file.type)) return "仅支持 JPG/PNG/WebP 格式";
+                if (file.size > 10 * 1024 * 1024) return "文件超过 10 MB";
+                return null;
+            }
+
+            // ── Predict single file ─────────────────────
+            async function runPredict(file) {
+                const form = new FormData();
+                form.append("file", file);
+                const r = await fetch(`${API}/predict`, {
+                    method: "POST",
+                    body: form,
+                });
+                const d = await r.json();
+                if (!d.success) throw new Error(d.error?.message ?? "识别失败");
+                return d;
+            }
+
+            // ── SINGLE MODE ─────────────────────────────
+            function handleSingle(file) {
+                if (objectUrl) URL.revokeObjectURL(objectUrl);
+                objectUrl = URL.createObjectURL(file);
+                $("preview-img").src = objectUrl;
+                uploadZone.classList.add("hidden");
+                previewWrap.classList.remove("hidden");
+                singleCol.classList.remove("hidden");
+                batchSection.classList.add("hidden");
+                showOnly(spinner);
+
+                runPredict(file)
+                    .then((data) => {
+                        renderSingleResult(data);
+                        _currentClass = data.predicted_class;
+                        renderCityGuide(_currentCity, _currentClass);
+                    })
+                    .catch((e) => {
+                        $("error-msg").textContent =
+                            e.message || "无法连接后端（port 8000）";
+                        showOnly(errorBox);
+                    });
+            }
+
+            function renderSingleResult(data) {
+                const cls = data.predicted_class;
+                const cfg = CATS[cls] ?? {
+                    zh: cls,
+                    en: cls,
+                    color: "#5A8050",
+                    tip: "",
+                    auc: null,
+                };
+                const met = METRICS[cls];
+                const pct = (data.confidence * 100).toFixed(1);
+
+                $("res-accent").style.background = cfg.color;
+                $("res-name").textContent = cfg.zh;
+                $("res-key").textContent = cfg.en;
+                $("res-pct").textContent = pct + "%";
+                $("res-bar").style.width = pct + "%";
+                $("res-bar").style.background = cfg.color;
+
+                $("res-tip-text").textContent = cfg.tip || "";
+                $("res-tip").classList.toggle("hidden", !cfg.tip);
+
+                const list = $("topk-list");
+                list.innerHTML = "";
+                data.top_k.forEach((item, i) => {
+                    const c = CATS[item.class] ?? {
+                        zh: item.class,
+                        en: item.class,
+                        color: "#5A8050",
+                    };
+                    const s = (item.score * 100).toFixed(1);
+                    const row = document.createElement("div");
+                    row.className = `topk-row rank-${i + 1}`;
+                    row.innerHTML = `
+      <div class="topk-name-block">
+        <span class="topk-cn">${c.zh}</span>
+        <span class="topk-en">${c.en}</span>
+      </div>
+      <div class="topk-bar-track">
+        <div class="topk-bar-fill" style="width:${s}%;background:${c.color}"></div>
+      </div>
+      <span class="topk-score">${s}%</span>
+    `;
+                    list.appendChild(row);
+                });
+
+                if (met) {
+                    $("m-precision").textContent =
+                        (met.precision * 100).toFixed(1) + "%";
+                    $("m-recall").textContent =
+                        (met.recall * 100).toFixed(1) + "%";
+                    $("m-f1").textContent = (met.f1 * 100).toFixed(1) + "%";
+                    $("m-auc").textContent = cfg.auc ? cfg.auc.toFixed(4) : "—";
+                    $("res-metrics-section").classList.remove("hidden");
+                } else {
+                    $("res-metrics-section").classList.add("hidden");
+                }
+
+                $("res-meta").innerHTML =
+                    `<span>处理时间 ${data.processing_ms} ms</span><span style="opacity:.35"> · </span>` +
+                    `<span>${data.model_version}</span><span style="opacity:.35"> · </span>` +
+                    `<span>REQ ${data.request_id}</span>`;
+
+                showOnly(resultCard);
+            }
+
+            // ── BATCH MODE ───────────────────────────────
+            async function handleBatch(files) {
+                uploadZone.classList.add("hidden");
+                previewWrap.classList.add("hidden");
+                singleCol.classList.add("hidden");
+                batchSection.classList.remove("hidden");
+                $("batch-grid").innerHTML = "";
+                $("summary-tbody").innerHTML = "";
+                $("summary-wrap").classList.add("hidden");
+                $("batch-progress-wrap").classList.remove("hidden");
+                $("batch-count").textContent = `共 ${files.length} 张图片`;
+                _batchResults = [];
+
+                // Pre-create card placeholders
+                const grid = $("batch-grid");
+                const placeholders = files.map((file, i) => {
+                    const url = URL.createObjectURL(file);
+                    const card = document.createElement("div");
+                    card.className = "batch-item";
+                    card.id = `batch-item-${i}`;
+                    card.innerHTML = `
+      <div class="batch-item-img-wrap">
+        <img class="batch-item-img" src="${url}" alt="${file.name}"/>
+        <div style="position:absolute;inset:0;background:rgba(234,228,211,.6);display:flex;align-items:center;justify-content:center" id="batch-overlay-${i}">
+          <div class="spinner-ring" style="width:28px;height:28px;border-width:1.5px"></div>
+        </div>
+      </div>
+      <p class="batch-item-filename">${file.name}</p>
+      <div id="batch-body-${i}"></div>
+    `;
+                    grid.appendChild(card);
+                    return { card, url };
+                });
+
+                // Process sequentially (avoid overloading CPU-only backend)
+                for (let i = 0; i < files.length; i++) {
+                    $("batch-progress-text").textContent =
+                        `${i} / ${files.length}`;
+                    $("batch-progress-fill").style.width =
+                        `${(i / files.length) * 100}%`;
+
+                    const file = files[i];
+                    const overlay = $(`batch-overlay-${i}`);
+                    const body = $(`batch-body-${i}`);
+
+                    try {
+                        const data = await runPredict(file);
+                        const cls = data.predicted_class;
+                        const cfg = CATS[cls] ?? {
+                            zh: cls,
+                            en: cls,
+                            color: "#5A8050",
+                            tip: "",
+                            auc: null,
+                        };
+                        const met = METRICS[cls];
+                        const pct = (data.confidence * 100).toFixed(1);
+
+                        // Remove loading overlay
+                        overlay.remove();
+
+                        // Add accent bar
+                        const accent = document.createElement("div");
+                        accent.className = "batch-item-accent";
+                        accent.style.background = cfg.color;
+                        placeholders[i].card
+                            .querySelector(".batch-item-img-wrap")
+                            .after(accent);
+
+                        // Fill body
+                        const topKRows = data.top_k
+                            .map((item, r) => {
+                                const c = CATS[item.class] ?? {
+                                    zh: item.class,
+                                    color: "#5A8050",
+                                };
+                                const s = (item.score * 100).toFixed(1);
+                                return `<div class="batch-item-topk-row">
+          <span class="batch-item-topk-name">${c.zh}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${s}%;background:${r === 0 ? cfg.color : "#B2CCA4"}"></div></div>
+          <span class="batch-item-topk-score">${s}%</span>
+        </div>`;
+                            })
+                            .join("");
+
+                        const cityInfo = _currentCity
+                            ? getCityClassification(
+                                  _currentCity,
+                                  data.predicted_class,
+                              )
+                            : null;
+                        const cityBlock = cityInfo
+                            ? `
+        <div style="padding:10px 14px 12px;border-top:1px solid var(--border);background:rgba(43,74,40,.04)">
+          <div style="font-family:'Courier Prime',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--green-sage);margin-bottom:6px">${_currentCity} · 当地分类</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="width:14px;height:14px;border-radius:50%;background:${cityInfo.binHex};flex-shrink:0;display:inline-block"></span>
+            <span style="font-family:'Noto Serif SC',serif;font-weight:500;font-size:.92rem;color:var(--ink)">${cityInfo.category}</span>
+            <span style="font-family:'Courier Prime',monospace;font-size:.65rem;color:var(--green-sage)">${cityInfo.binLabel}</span>
+          </div>
+          <p style="font-size:.78rem;line-height:1.6;color:var(--ink-mid)">${cityInfo.instruction}</p>
+        </div>`
+                            : "";
+
+                        body.innerHTML = `
+        <p class="batch-item-class">${cfg.zh}</p>
+        <p class="batch-item-en">${cfg.en}</p>
+        <div class="batch-item-conf-row">
+          <span class="batch-item-conf-pct" style="color:${cfg.color}">${pct}%</span>
+          <div class="conf-track" style="flex:1"><div class="conf-fill" style="width:${pct}%;background:${cfg.color}"></div></div>
+        </div>
+        <div class="batch-item-topk">${topKRows}</div>
+        ${
+            met
+                ? `<div class="batch-item-metrics">
+          <div class="batch-metric"><span class="batch-metric-label">Precision</span><span class="batch-metric-val">${(met.precision * 100).toFixed(1)}%</span></div>
+          <div class="batch-metric"><span class="batch-metric-label">Recall</span><span class="batch-metric-val">${(met.recall * 100).toFixed(1)}%</span></div>
+          <div class="batch-metric"><span class="batch-metric-label">F1-Score</span><span class="batch-metric-val">${(met.f1 * 100).toFixed(1)}%</span></div>
+          <div class="batch-metric"><span class="batch-metric-label">ROC AUC</span><span class="batch-metric-val">${cfg.auc ? cfg.auc.toFixed(4) : "—"}</span></div>
+        </div>`
+                : ""
+        }
+        ${cityBlock}
+      `;
+
+                        _batchResults.push({
+                            i: i + 1,
+                            file: file.name,
+                            url: placeholders[i].url,
+                            data,
+                            cfg,
+                            met,
+                        });
+                    } catch (e) {
+                        overlay.remove();
+                        body.innerHTML = `<p class="batch-item-error">识别失败：${e.message}</p>`;
+                        _batchResults.push({
+                            i: i + 1,
+                            file: file.name,
+                            url: placeholders[i].url,
+                            error: e.message,
+                        });
+                    }
+                }
+
+                // Done
+                $("batch-progress-text").textContent =
+                    `${files.length} / ${files.length}`;
+                $("batch-progress-fill").style.width = "100%";
+                setTimeout(
+                    () => $("batch-progress-wrap").classList.add("hidden"),
+                    600,
+                );
+
+                // Build summary table
+                buildSummaryTable();
+            }
+
+            function buildSummaryTable() {
+                const tbody = $("summary-tbody");
+                tbody.innerHTML = "";
+
+                // Update city column header
+                const cityHeader = $("city-col-header");
+                if (cityHeader)
+                    cityHeader.textContent = _currentCity
+                        ? `${_currentCity} 分类`
+                        : "当地分类";
+
+                _batchResults.forEach((row) => {
+                    const tr = document.createElement("tr");
+                    if (row.error) {
+                        tr.innerHTML = `
+        <td class="td-mono">${row.i}</td>
+        <td><img class="td-thumb" src="${row.url}" alt=""/></td>
+        <td class="td-mono" colspan="11" style="color:#b85c3a;font-style:italic">识别失败：${row.error}</td>
+      `;
+                    } else {
+                        const { data, cfg, met } = row;
+                        const pct = (data.confidence * 100).toFixed(1);
+                        const color = cfg.color;
+
+                        // City classification
+                        const ci = _currentCity
+                            ? getCityClassification(
+                                  _currentCity,
+                                  data.predicted_class,
+                              )
+                            : null;
+                        const cityTd = ci
+                            ? `<td>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="width:10px;height:10px;border-radius:50%;background:${ci.binHex};flex-shrink:0;display:inline-block"></span>
+              <span class="td-class" style="font-size:.82rem">${ci.category}</span>
+            </div>
+            <div class="td-mono" style="font-size:.62rem;color:var(--green-sage);margin-top:2px">${ci.binLabel}</div>
+           </td>`
+                            : `<td class="td-mono" style="color:var(--green-sage);font-style:italic">未选择城市</td>`;
+
+                        const instrTd = ci
+                            ? `<td style="font-size:.78rem;line-height:1.5;color:var(--ink-mid);max-width:240px">${ci.instruction}</td>`
+                            : `<td class="td-mono" style="color:var(--green-sage)">—</td>`;
+
+                        tr.innerHTML = `
+        <td class="td-mono">${row.i}</td>
+        <td><img class="td-thumb" src="${row.url}" alt=""/></td>
+        <td class="td-mono" style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${row.file}</td>
+        <td class="td-class">${cfg.zh}</td>
+        <td style="font-family:'Fraunces',serif;font-style:italic;color:var(--green-mid)">${cfg.en}</td>
+        <td class="td-conf">
+          <div class="conf-badge">
+            <span class="conf-dot" style="background:${color}"></span>
+            <span style="color:${color}">${pct}%</span>
+          </div>
+        </td>
+        ${cityTd}
+        ${instrTd}
+        <td class="td-mono">${met ? (met.precision * 100).toFixed(1) + "%" : "—"}</td>
+        <td class="td-mono">${met ? (met.recall * 100).toFixed(1) + "%" : "—"}</td>
+        <td class="td-mono">${met ? (met.f1 * 100).toFixed(1) + "%" : "—"}</td>
+        <td class="td-mono">${cfg.auc ? cfg.auc.toFixed(4) : "—"}</td>
+        <td class="td-mono">${data.processing_ms} ms</td>
+      `;
+                    }
+                    tbody.appendChild(tr);
+                });
+                $("summary-wrap").classList.remove("hidden");
+            }
+
+            // ── CSV export ──────────────────────────────
+            function exportCSV() {
+                const header = [
+                    "#",
+                    "文件名",
+                    "识别类别",
+                    "英文",
+                    "信心度(%)",
+                    _currentCity ? `${_currentCity}_分类` : "当地分类",
+                    "回收说明",
+                    "Precision",
+                    "Recall",
+                    "F1",
+                    "ROC_AUC",
+                    "处理时间(ms)",
+                ];
+                const rows = _batchResults.map((row) => {
+                    if (row.error)
+                        return [
+                            row.i,
+                            row.file,
+                            "ERROR",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                            "",
+                        ];
+                    const { data, cfg, met } = row;
+                    const ci = _currentCity
+                        ? getCityClassification(
+                              _currentCity,
+                              data.predicted_class,
+                          )
+                        : null;
+                    return [
+                        row.i,
+                        row.file,
+                        cfg.zh,
+                        cfg.en,
+                        (data.confidence * 100).toFixed(2),
+                        ci ? ci.category : "",
+                        ci ? ci.instruction : "",
+                        met ? (met.precision * 100).toFixed(2) : "",
+                        met ? (met.recall * 100).toFixed(2) : "",
+                        met ? (met.f1 * 100).toFixed(2) : "",
+                        cfg.auc ? cfg.auc.toFixed(4) : "",
+                        data.processing_ms,
+                    ];
+                });
+                const csv = [header, ...rows]
+                    .map((r) => r.map((v) => `"${v}"`).join(","))
+                    .join("\n");
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(
+                    new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8" }),
+                );
+                a.download = `garbage_classification_${Date.now()}.csv`;
+                a.click();
+            }
+
+            // ── Entry point ─────────────────────────────
+            function handleFiles(files) {
+                const valid = Array.from(files).filter((f) => {
+                    const err = validateFile(f);
+                    if (err) {
+                        console.warn(f.name, err);
+                        return false;
+                    }
+                    return true;
+                });
+                if (!valid.length) {
+                    alert("没有可处理的图片文件。");
+                    return;
+                }
+                if (valid.length === 1) handleSingle(valid[0]);
+                else handleBatch(valid);
+            }
+
+            // ── Events ──────────────────────────────────
+            uploadZone.addEventListener("click", () => fileInput.click());
+            uploadZone.addEventListener(
+                "keydown",
+                (e) => e.key === "Enter" && fileInput.click(),
+            );
+            uploadZone.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                uploadZone.classList.add("drag-over");
+            });
+            uploadZone.addEventListener("dragleave", () =>
+                uploadZone.classList.remove("drag-over"),
+            );
+            uploadZone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove("drag-over");
+                if (e.dataTransfer.files.length)
+                    handleFiles(e.dataTransfer.files);
+            });
+            fileInput.addEventListener("change", () => {
+                if (fileInput.files.length) {
+                    handleFiles(fileInput.files);
+                    fileInput.value = "";
+                }
+            });
+            $("reset-btn").addEventListener("click", resetUI);
+            $("retry-btn").addEventListener("click", resetUI);
+            $("batch-reset-btn").addEventListener("click", resetUI);
+            $("export-btn").addEventListener("click", exportCSV);
+
+            // ════════════════════════════════════════════
+            //  CITY CLASSIFICATION DATABASE
+            // ════════════════════════════════════════════
+            // food:      local term for kitchen/food waste
+            // foodColor: bin color (green | brown)
+            // other:     local term for residual waste
+            // otherColor:bin color (black | gray)
+            // battery:   'hazardous' | 'guangzhou' (dry cells → other)
+            // recycColor:'blue' | 'green' (银川 anomaly)
+            // regulation: name of local ordinance
+            // year: regulation year
+            // notes: city-specific rules shown to user
+
+            const CITY_DB = {
+                北京: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《北京市生活垃圾管理条例》",
+                    year: 2020,
+                    notes: [
+                        "其他垃圾使用灰色桶",
+                        "可口诀记忆：能卖钱蓝桶，易腐烂绿桶，有毒有害红桶，没人要灰桶",
+                    ],
+                },
+                天津: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《天津市生活垃圾管理条例》",
+                    year: 2020,
+                    notes: ["天津官方文件标注了精确的Pantone颜色标准"],
+                },
+                石家庄: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《石家庄市生活垃圾分类管理条例》",
+                    year: 2021,
+                    notes: [],
+                },
+                太原: {
+                    food: "易腐垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《太原市生活垃圾分类管理条例》",
+                    year: 2020,
+                    notes: [
+                        "山西省使用「易腐垃圾」而非「厨余垃圾」",
+                        "另设大件垃圾、装修垃圾单独处理",
+                    ],
+                },
+                呼和浩特: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《呼和浩特市生活垃圾分类管理办法》",
+                    year: 2020,
+                    notes: ["办公/公共场所仅设可回收物与其他垃圾两类桶"],
+                },
+                哈尔滨: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《哈尔滨市生活垃圾分类管理条例》",
+                    year: 2022,
+                    notes: [
+                        "其他垃圾使用灰色桶",
+                        "饮料纸基复合包装明确列为可回收物",
+                    ],
+                },
+                沈阳: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《沈阳市生活垃圾管理条例》",
+                    year: 2022,
+                    notes: ["木材类废弃物明确列为可回收物"],
+                },
+                大连: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《大连市生活垃圾分类管理条例》",
+                    year: 2019,
+                    notes: ["其他垃圾使用灰色桶"],
+                },
+                长春: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《长春市生活垃圾分类管理条例》",
+                    year: 2021,
+                    notes: [],
+                },
+                上海: {
+                    food: "湿垃圾",
+                    foodColor: "brown",
+                    other: "干垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《上海市生活垃圾管理条例》",
+                    year: 2019,
+                    notes: [
+                        "上海是全国唯一使用棕色桶收集湿垃圾的城市",
+                        "使用「干垃圾」而非「其他垃圾」",
+                        "个人违规最高罚款200元，是全国执法最严格的城市",
+                        "投放前须沥干水分并去除外包装",
+                    ],
+                },
+                南京: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《南京市生活垃圾管理条例》",
+                    year: 2020,
+                    notes: ["民间也称「湿垃圾/干垃圾」，与上海用法类似"],
+                },
+                杭州: {
+                    food: "易腐垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《杭州市生活垃圾管理条例》",
+                    year: 2019,
+                    notes: [
+                        "浙江省使用「易腐垃圾」统一术语",
+                        "其他垃圾旧版为黄色桶，2020年后更换为灰色",
+                    ],
+                },
+                宁波: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《宁波市生活垃圾分类管理条例》",
+                    year: 2019,
+                    notes: [
+                        "全国最早推行垃圾分类的城市之一（2013年起试点）",
+                        "电子废弃物及包装材料明确列为可回收物",
+                    ],
+                },
+                无锡: {
+                    food: "易腐垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《无锡市城乡生活垃圾分类管理条例》",
+                    year: 2020,
+                    notes: ["江苏省内使用「易腐垃圾」的代表城市"],
+                },
+                苏州: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《苏州市生活垃圾分类管理条例》",
+                    year: 2019,
+                    notes: ["分居住区和办公场所分别制定详细指引"],
+                },
+                合肥: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《合肥市生活垃圾分类管理条例》",
+                    year: 2020,
+                    notes: [],
+                },
+                福州: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《福州市生活垃圾分类管理条例》",
+                    year: 2020,
+                    notes: [],
+                },
+                厦门: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《厦门经济特区生活垃圾分类管理办法》",
+                    year: 2017,
+                    notes: ["全国首批46个强制分类城市之一（2017年立法）"],
+                },
+                青岛: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《青岛市生活垃圾分类管理办法》",
+                    year: 2020,
+                    notes: [],
+                },
+                济南: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《山东省生活垃圾管理条例》",
+                    year: 2020,
+                    notes: [],
+                },
+                南昌: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《南昌市生活垃圾分类管理条例》",
+                    year: 2020,
+                    notes: ["官方文件同样标注了精确Pantone颜色标准"],
+                },
+                武汉: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《武汉市生活垃圾分类管理办法》",
+                    year: 2021,
+                    notes: ["明确禁止在运输过程中混合已分类垃圾"],
+                },
+                长沙: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《长沙市生活垃圾管理条例》",
+                    year: 2020,
+                    notes: [],
+                },
+                郑州: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《郑州市城市生活垃圾分类管理办法》",
+                    year: 2019,
+                    notes: [],
+                },
+                广州: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "guangzhou",
+                    recycColor: "blue",
+                    regulation: "《广州市生活垃圾分类管理条例》",
+                    year: 2018,
+                    notes: [
+                        "⚠️ 广州特别规定：普通干电池（碱性/锌锰型）→ 其他垃圾；充电电池、纽扣电池仍须放入有害垃圾桶",
+                        "硬骨头、贝壳、玉米棒→ 其他垃圾（而非厨余垃圾）",
+                        "2023年更新了详细的分类指导目录",
+                    ],
+                },
+                深圳: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《深圳市生活垃圾分类管理条例》",
+                    year: 2020,
+                    notes: ["深圳地方标准DB4403/T 73-2020明确规定了桶色标准"],
+                },
+                南宁: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《南宁市生活垃圾分类管理条例》",
+                    year: 2020,
+                    notes: [],
+                },
+                海口: {
+                    food: "易腐垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《海口市生活垃圾分类管理办法》",
+                    year: 2018,
+                    notes: ["海南省使用「易腐垃圾」统一术语"],
+                },
+                成都: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《成都市生活垃圾管理条例》",
+                    year: 2021,
+                    notes: [],
+                },
+                重庆: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《重庆市生活垃圾管理条例》",
+                    year: 2017,
+                    notes: [],
+                },
+                贵阳: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《贵阳市城镇生活垃圾分类管理条例》",
+                    year: 2022,
+                    notes: [],
+                },
+                昆明: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《昆明市生活垃圾管理条例》",
+                    year: 2023,
+                    notes: ["厨余垃圾包含家庭厨余与餐厨两类"],
+                },
+                拉萨: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《拉萨市城市生活垃圾分类管理办法》",
+                    year: 2020,
+                    notes: ["有害垃圾（电池等）建议装入红色袋后再投入红色桶"],
+                },
+                西安: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "gray",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《西安市生活垃圾分类管理办法》",
+                    year: 2019,
+                    notes: ["其他垃圾使用灰色桶"],
+                },
+                兰州: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《甘肃省城市生活垃圾管理条例》",
+                    year: 2020,
+                    notes: ["兰州为全国首批46个垃圾分类示范城市之一"],
+                },
+                乌鲁木齐: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《乌鲁木齐市生活垃圾分类管理办法》",
+                    year: 2020,
+                    notes: ["垃圾桶须设置汉维双语标识"],
+                },
+                银川: {
+                    food: "湿垃圾",
+                    foodColor: "gray",
+                    other: "干垃圾",
+                    otherColor: "blue",
+                    battery: "hazardous",
+                    recycColor: "green",
+                    regulation: "《宁夏回族自治区固体废物污染环境防治条例》",
+                    year: 2023,
+                    notes: [
+                        "⚠️ 银川垃圾桶颜色与全国标准相反：绿色=可回收物，蓝色=干垃圾（其他垃圾），以当地实际桶色为准",
+                        "银川使用「再生资源」称呼可回收物",
+                    ],
+                },
+                西宁: {
+                    food: "厨余垃圾",
+                    foodColor: "green",
+                    other: "其他垃圾",
+                    otherColor: "black",
+                    battery: "hazardous",
+                    recycColor: "blue",
+                    regulation: "《西宁市生活垃圾分类管理办法》",
+                    year: 2018,
+                    notes: [],
+                },
+            };
+
+            const BIN_META = {
+                blue: { label: "蓝色可回收物桶", hex: "#2A5F8A" },
+                green: { label: "绿色桶", hex: "#3D6438" },
+                red: { label: "红色有害垃圾桶", hex: "#B85C3A" },
+                brown: { label: "棕色桶", hex: "#7A4520" },
+                black: { label: "黑色桶", hex: "#2A2A2A" },
+                gray: { label: "灰色桶", hex: "#5A5A5A" },
+            };
+
+            // Per-class instructions (default, overridden per city)
+            const CLASS_INSTRUCTIONS = {
+                battery:
+                    "将电池完整放入专用有害垃圾桶，勿拆解，勿与其他垃圾混合。",
+                biological: "去除外包装，沥干水分后投入指定厨余垃圾桶。",
+                cardboard:
+                    "压扁捆绑后投入可回收物桶；污损或沾油的纸板投入其他垃圾桶。",
+                clothes:
+                    "干净衣物优先捐赠或送至小区旧衣回收箱，破损严重的可投入其他垃圾桶。",
+                glass: "清洗晾干后投入可回收物桶。破碎玻璃请用厚纸包裹后再投入，避免划伤。",
+                metal: "清洗后压扁，投入可回收物桶（铁铝罐）。",
+                paper: "保持干燥，投入可回收物桶。卫生纸、餐巾纸等吸水纸请投入其他垃圾桶。",
+                plastic:
+                    "清洗干净后投入可回收物桶。塑料袋、一次性餐具等请投入其他垃圾桶。",
+                shoes: "可穿着的鞋子优先送至旧衣回收点，严重破损的投入其他垃圾桶。",
+                trash: "直接投入其他垃圾桶，无需特殊处理。",
+            };
+
+            // City-specific overrides for certain waste classes
+            const CITY_CLASS_OVERRIDES = {
+                上海: {
+                    biological:
+                        "剥去外包装，沥干水分后投入棕色湿垃圾桶。上海规定：投放前须拆袋倒入桶内，塑料袋本身为干垃圾。",
+                    trash: "直接投入黑色干垃圾桶，勿破坏袋体。",
+                    cardboard:
+                        "干净纸板投入蓝色可回收物桶；污损纸板投入黑色干垃圾桶。",
+                    paper: "干净纸张投入蓝色可回收物桶；纸巾、餐巾纸投入黑色干垃圾桶。",
+                    plastic:
+                        "清洗干净的塑料瓶罐投入蓝色可回收物桶；塑料袋、一次性餐具投入黑色干垃圾桶。",
+                },
+                广州: {
+                    battery:
+                        "⚠️ 广州特别规定：日常使用的碱性干电池（5号/7号等）可投入灰色其他垃圾桶；充电电池、纽扣电池须投入红色有害垃圾桶。",
+                    biological:
+                        "去除外包装，沥干水分后投入绿色厨余垃圾桶。注意：硬骨头、贝壳、玉米棒属于其他垃圾。",
+                },
+                杭州: {
+                    biological:
+                        "去除外包装后投入绿色易腐垃圾桶。浙江省统一使用「易腐垃圾」称谓。",
+                },
+                无锡: { biological: "去除外包装后投入绿色易腐垃圾桶。" },
+                大连: {
+                    biological: "去除外包装后投入绿色厨余（易腐）垃圾桶。",
+                },
+                太原: {
+                    biological:
+                        "去除外包装后投入绿色易腐垃圾桶（山西省统一用语）。",
+                },
+                海口: {
+                    biological:
+                        "去除外包装后投入绿色易腐垃圾桶（海南省统一用语）。",
+                },
+                银川: {
+                    biological:
+                        "投入灰色湿垃圾桶（注：银川灰色桶对应其他城市的绿色厨余桶）。",
+                    trash: "投入蓝色干垃圾桶（注：银川蓝色桶对应其他城市的黑/灰色其他垃圾桶）。",
+                    cardboard:
+                        "投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+                    clothes:
+                        "投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+                    glass: "投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+                    metal: "投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+                    paper: "干净纸张投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+                    plastic:
+                        "清洗后投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+                    shoes: "可穿着的鞋子投入绿色再生资源桶（注：银川绿色桶对应其他城市的蓝色可回收物桶）。",
+                },
+            };
+
+            // Determine how a waste class maps to a city's category
+            function getCityClassification(cityKey, wasteClass) {
+                const city = CITY_DB[cityKey];
+                if (!city) return null;
+
+                let category, colorKey, instruction;
+                const override = CITY_CLASS_OVERRIDES[cityKey]?.[wasteClass];
+                instruction = override || CLASS_INSTRUCTIONS[wasteClass];
+
+                if (wasteClass === "biological") {
+                    category = city.food;
+                    colorKey = city.foodColor;
+                } else if (wasteClass === "battery") {
+                    if (city.battery === "guangzhou") {
+                        // Guangzhou: dry cell → other, rechargeable → hazardous
+                        category = "其他垃圾（普通干电池）";
+                        colorKey = city.otherColor;
+                    } else {
+                        category = "有害垃圾";
+                        colorKey = "red";
+                    }
+                } else if (wasteClass === "trash") {
+                    category = city.other;
+                    colorKey = city.otherColor;
+                } else {
+                    // recyclables
+                    category =
+                        cityKey === "银川"
+                            ? "再生资源（可回收物）"
+                            : "可回收物";
+                    colorKey = city.recycColor;
+                }
+
+                const binMeta = BIN_META[colorKey] ?? BIN_META.blue;
+                return {
+                    category,
+                    colorKey,
+                    binLabel: binMeta.label,
+                    binHex: binMeta.hex,
+                    instruction,
+                    notes: city.notes,
+                    regulation: city.regulation,
+                    year: city.year,
+                };
+            }
+
+            // Render city guide panel
+            function renderCityGuide(cityKey, wasteClass) {
+                const guide = $("city-guide");
+                if (!cityKey || !wasteClass) {
+                    guide.classList.add("hidden");
+                    return;
+                }
+
+                const info = getCityClassification(cityKey, wasteClass);
+                if (!info) {
+                    guide.classList.add("hidden");
+                    return;
+                }
+
+                $("cg-city-name").textContent = `${cityKey} · 当地分类规范`;
+                $("cg-reg").innerHTML =
+                    `${info.regulation}<br>${info.year} 年施行`;
+
+                const circle = $("cg-bin-circle");
+                circle.className = "bin-circle";
+                circle.style.background = info.binHex;
+
+                $("cg-category").textContent = info.category;
+                $("cg-bin-hint").textContent = info.binLabel;
+                $("cg-instruction").textContent = info.instruction;
+
+                const notesEl = $("cg-notes");
+                notesEl.innerHTML = "";
+                info.notes.forEach((n) => {
+                    const item = document.createElement("div");
+                    item.className = "city-note-item";
+                    item.innerHTML = `<span class="city-note-dot"></span><span>${n}</span>`;
+                    notesEl.appendChild(item);
+                });
+
+                guide.classList.remove("hidden");
+            }
+
+            // Persist city selection & hook up events
+            let _currentCity = localStorage.getItem("gc_city") || "";
+            let _currentClass = null;
+
+            const citySelect = $("city-select");
+            if (_currentCity) citySelect.value = _currentCity;
+
+            citySelect.addEventListener("change", () => {
+                _currentCity = citySelect.value;
+                localStorage.setItem("gc_city", _currentCity);
+                // Update single result guide
+                if (_currentClass) renderCityGuide(_currentCity, _currentClass);
+                else $("city-guide").classList.add("hidden");
+                // Rebuild batch summary if visible
+                if (
+                    _batchResults.length > 0 &&
+                    !$("summary-wrap").classList.contains("hidden")
+                ) {
+                    buildSummaryTable();
+                }
+            });
+
+            // Hook into renderSingleResult to also update city guide
+            const _origRenderSingle = renderSingleResult;
+            // Override: after rendering result, also show city guide
+            function renderSingleResultWithCity(data) {
+                _origRenderSingle(data);
+                _currentClass = data.predicted_class;
+                renderCityGuide(_currentCity, _currentClass);
+            }
+            // Patch the reference in handleSingle
+            const _origHandleSingle = handleSingle;
+        </script>
+    </body>
+</html>
